@@ -42,10 +42,7 @@ export default function Home() {
     <div className="space-y-16 py-8">
       {/* Hero Section */}
       <div className="text-center max-w-3xl mx-auto space-y-6 animate-fade-in">
-        <div className="inline-flex items-center space-x-2 bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border border-indigo-100 shadow-sm">
-          <ShieldCheck className="h-4 w-4" />
-          <span>Privacy Guaranteed: No images leave your browser</span>
-        </div>
+        
         
         <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-none text-slate-900">
           Simple, Fast, and Secure{' '}

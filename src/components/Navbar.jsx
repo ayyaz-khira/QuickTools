@@ -17,15 +17,17 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3 group">
-              <div className="bg-gradient-to-tr from-indigo-500 to-purple-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-300">
-                <Settings className="h-6 w-6 animate-spin-slow" />
-              </div>
-              <span className="font-extrabold text-xl tracking-tight text-slate-900">
-                QuickTools
-              </span>
-            </Link>
-          </div>
+  <Link to="/" className="flex items-center space-x-2 group">   {/* Changed from space-x-3 to space-x-2 */}
+    <img
+      src="/images/quicktools-logo.png"
+      alt="QuickTools"
+      className="w-16 h-16 object-contain group-hover:scale-105 transition-all duration-300"
+    />
+    <span className="font-extrabold text-xl tracking-tight text-slate-900">
+      QuickTools
+    </span>
+  </Link>
+</div>
           
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-1">
