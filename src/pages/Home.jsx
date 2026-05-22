@@ -1,16 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Camera, Image as ImageIcon, CheckSquare, ArrowRight, ShieldCheck, Zap, Heart } from 'lucide-react';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 
 export default function Home() {
-  useSEO({
-    title: 'Local-First Image & Document Utilities',
-    description: 'QuickTools provides local-first, privacy-focused image resizing, signature cropping, and passport photo formatting tools. No uploads, offline-capable.'
-  });
-
   const tools = [
     {
-      name: 'Passport Photo Maker',
+      name: 'Passport Size Photo Maker',
       description: 'Crop and align your photos to official government passport sizes. Features head overlay guides, custom crop positions, and a multi-photo print sheet generator.',
       href: '/passport-photo',
       icon: Camera,
@@ -39,8 +34,13 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-16 py-8">
-      {/* Hero Section */}
+    <>
+      <SEO
+        title="QuickTools - Free Local-First Image Utilities"
+        description="QuickTools provides local-first, privacy-first image utilities for passport photos, file-size resizing, and signature cropping with zero uploads."
+      />
+      <div className="space-y-16 py-8">
+        {/* Hero Section */}
       <div className="text-center max-w-3xl mx-auto space-y-6 animate-fade-in">
         
         
@@ -157,5 +157,6 @@ Resize images, create passport photos, and crop signatures instantly in your bro
         </div>
       </div>
     </div>
+    </>
   );
 }

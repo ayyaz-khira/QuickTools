@@ -1,16 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
 import { Upload, Download, Sliders, RefreshCw, X, Palette, Eye, AlertCircle, ShieldCheck } from 'lucide-react';
 import { getCleanedSignatureImg } from '../utils/cropImage';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 import { isSupportedImageFile } from '../utils/fileValidation';
 
 export default function SignatureCropper() {
-  useSEO({
-    title: 'Signature Cropper & Cleaner',
-    description: 'Crop and clean handwritten signatures from paper or scans. Make signature backgrounds transparent (PNG) or solid white (JPG) instantly.'
-  });
-
   const testImageSrc = new URLSearchParams(window.location.search).get('test') === 'true'
     ? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAExJREFUeNrs0UENAAAMwzCdff9O7+ACWshkpqoCDmRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQcDgEGAM5KAAHO4G9kAAAAAElFTkSuQmCC'
     : null;
@@ -160,7 +156,12 @@ export default function SignatureCropper() {
   // downloadSignature is handled natively via <a> element now
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 py-4">
+    <>
+      <SEO
+        title="Signature Cropper Online Free | QuickTools"
+        description="Crop and clean handwritten signatures locally in your browser with adjustable threshold, contrast, and transparent PNG export. Privacy-first and no server upload."
+      />
+      <div className="max-w-5xl mx-auto space-y-8 py-4">
       {/* Header */}
       <div className="space-y-3">
         <h1 className="text-3xl font-extrabold text-slate-900">Signature Cropper & Cleaner</h1>
@@ -521,6 +522,67 @@ export default function SignatureCropper() {
         </div>
 
       </div>
-    </div>
+
+      <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">
+        <div>
+          <h2 id="signature-overview" className="text-2xl font-bold text-slate-900">Signature Cropper Overview</h2>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Signature Cropper cleans up scanned handwriting in the browser. It preserves your privacy by keeping the image processing local and provides transparent PNG export for digital forms.
+          </p>
+        </div>
+
+        <section aria-labelledby="signature-features" className="space-y-4">
+          <h3 id="signature-features" className="text-xl font-semibold text-slate-900">Features</h3>
+          <ul className="space-y-3 text-sm text-slate-600">
+            <li className="list-disc list-inside">Interactive signature cropping with adjustable transparency output.</li>
+            <li className="list-disc list-inside">Brightness, contrast, and threshold controls for clean text extraction.</li>
+            <li className="list-disc list-inside">Download cleaned signature as transparent PNG or white-background JPG.</li>
+            <li className="list-disc list-inside">Local browser processing with no image uploads.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="signature-usage" className="space-y-4">
+          <h3 id="signature-usage" className="text-xl font-semibold text-slate-900">How to Use</h3>
+          <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600">
+            <li>Choose a scanned signature image in JPG, PNG, or WEBP format.</li>
+            <li>Use the crop box to isolate the signature area and adjust the zoom.</li>
+            <li>Tune brightness, contrast, and threshold for optimal ink clarity.</li>
+            <li>Export the result as a transparent PNG or white-background JPG directly from your browser.</li>
+          </ol>
+        </section>
+
+        <section aria-labelledby="signature-faq" className="space-y-4">
+          <h3 id="signature-faq" className="text-xl font-semibold text-slate-900">FAQ</h3>
+          <div className="space-y-4 text-sm text-slate-600">
+            <div>
+              <p className="font-semibold text-slate-900">Is my signature uploaded anywhere?</p>
+              <p>No. Signature cleaning and cropping happen entirely on your device in the browser.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900">Can I get a transparent background?</p>
+              <p>Yes. Enable transparent background mode and download the cleaned signature as PNG.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900">What if the image is dark or noisy?</p>
+              <p>Use the brightness, contrast, and threshold sliders to improve contrast before export.</p>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="signature-related" className="space-y-4">
+          <h3 id="signature-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
+          <p className="text-sm text-slate-600">For passport photo formatting or precise file-size compression, use our other locally-run utility pages.</p>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
+            <li>
+                <Link to="/passport-photo" className="text-indigo-600 hover:underline">Passport Size Photo Maker</Link>
+            </li>
+            <li>
+              <Link to="/resize-image" className="text-indigo-600 hover:underline">Resize Image Tool</Link>
+            </li>
+          </ul>
+        </section>
+      </section>
+      </div>
+    </>
   );
 }

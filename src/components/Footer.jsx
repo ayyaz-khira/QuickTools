@@ -24,7 +24,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm font-semibold">
             <li>
               <Link to="/passport-photo" className="hover:text-indigo-600 transition-colors">
-                Passport Photo Maker
+                Passport Size Photo Maker
               </Link>
             </li>
             <li>

@@ -1,17 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
 import { Upload, X, Sliders, RefreshCw, Download, Image as ImageIcon, CheckCircle, AlertCircle, Palette, Maximize, Zap, Printer, FileText, FileImage } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { getCroppedImg, generatePrintSheetCanvas } from '../utils/cropImage';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 import { isSupportedImageFile } from '../utils/fileValidation';
 
 export default function PassportPhoto() {
-  useSEO({
-    title: 'Passport Photo Maker Professional',
-    description: 'Create high-precision biometric passport and visa photos with exact size presets, custom dimensions, background color swaps, and printable sheets.'
-  });
-
   const testImageSrc = new URLSearchParams(window.location.search).get('test') === 'true'
     ? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAExJREFUeNrs0UENAAAMwzCdff9O7+ACWshkpqoCDmRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQcDgEGAM5KAAHO4G9kAAAAAElFTkSuQmCC'
     : null;
@@ -351,10 +347,15 @@ export default function PassportPhoto() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 py-4">
-      {/* Page Header */}
+    <>
+      <SEO
+        title="Passport Size Photo Maker Online Free | QuickTools"
+        description="Create exact passport and visa photos in your browser with local-first processing, biometric alignment guides, and printable sheet export. No uploads required."
+      />
+      <div className="max-w-5xl mx-auto space-y-8 py-4">
+        {/* Page Header */}
       <div className="space-y-3">
-        <h1 className="text-3xl font-extrabold text-slate-900">Passport Photo Maker</h1>
+        <h1 className="text-3xl font-extrabold text-slate-900">Passport Size Photo Maker</h1>
         <p className="text-slate-600 text-sm">
           Crop, align, recolor backgrounds, and compress passport photos to your exact size guidelines. Complete offline operation ensures 100% privacy.
         </p>
@@ -829,6 +830,67 @@ export default function PassportPhoto() {
         </div>
 
       </div>
-    </div>
+
+      <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">
+        <div>
+          <h2 id="passport-overview" className="text-2xl font-bold text-slate-900">Passport Photo Tool Overview</h2>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            QuickTools Passport Photo Maker runs entirely in your browser. That means your identity image never leaves your device, and you get fast output without server uploads or storage.
+          </p>
+        </div>
+
+        <section aria-labelledby="passport-features" className="space-y-4">
+          <h3 id="passport-features" className="text-xl font-semibold text-slate-900">Features</h3>
+          <ul className="space-y-3 text-sm text-slate-600">
+            <li className="list-disc list-inside">Exact biometric presets for passport, visa, and ID photos.</li>
+            <li className="list-disc list-inside">Drag-to-align image cropping with head and chin guide overlays.</li>
+            <li className="list-disc list-inside">Background color control with white, blue, red, and grayscale options.</li>
+            <li className="list-disc list-inside">Download splits, printable A4 sheets, and secure local-only export.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="passport-usage" className="space-y-4">
+          <h3 id="passport-usage" className="text-xl font-semibold text-slate-900">How to Use</h3>
+          <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600">
+            <li>Upload a clear portrait photo in JPG, PNG, or WEBP format.</li>
+            <li>Choose a passport or visa size preset, or enter custom millimeter dimensions.</li>
+            <li>Adjust crop, zoom, rotation, and background color until the face fits the frame.</li>
+            <li>Export the corrected photo or generate a printable photo sheet without leaving your browser.</li>
+          </ol>
+        </section>
+
+        <section aria-labelledby="passport-faq" className="space-y-4">
+          <h3 id="passport-faq" className="text-xl font-semibold text-slate-900">FAQ</h3>
+          <div className="space-y-4 text-sm text-slate-600">
+            <div>
+              <p className="font-semibold text-slate-900">Does this tool upload my photo?</p>
+              <p>No. All photo formatting and export happen locally in your browser, so your passport photo never leaves your computer.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900">Which file types are supported?</p>
+              <p>QuickTools accepts JPG, JPEG, PNG, and WEBP image files for passport photo creation.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900">Can I print the result?</p>
+              <p>Yes. Use the printable sheet export to generate A4-ready passport photo layouts for printing.</p>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="passport-related" className="space-y-4">
+          <h3 id="passport-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
+          <p className="text-sm text-slate-600">Need a smaller upload-ready file or a clean signature asset? Try our related browser tools.</p>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
+            <li>
+              <Link to="/resize-image" className="text-indigo-600 hover:underline">Resize Image Tool</Link>
+            </li>
+            <li>
+              <Link to="/signature-cropper" className="text-indigo-600 hover:underline">Signature Cropper</Link>
+            </li>
+          </ul>
+        </section>
+      </section>
+      </div>
+    </>
   );
 }

@@ -7,7 +7,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigation = [
-    { name: 'Passport Photo', href: '/passport-photo', icon: Camera },
+    { name: 'Passport Size Photo Maker', href: '/passport-photo', icon: Camera },
     { name: 'Resize to KB', href: '/resize-image', icon: ImageIcon },
     { name: 'Signature Cropper', href: '/signature-cropper', icon: CheckSquare },
   ];
