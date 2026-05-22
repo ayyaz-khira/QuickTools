@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="QuickTools - Free Local-First Image Utilities"
+        title="QuickTools - Resize Image, Passport Photo & Signature Crop Tool"
         description="QuickTools provides local-first, privacy-first image utilities for passport photos, file-size resizing, and signature cropping with zero uploads."
       />
       <div className="space-y-16 py-8">
