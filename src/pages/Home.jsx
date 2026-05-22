@@ -45,15 +45,14 @@ export default function Home() {
         
         
         <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-none text-slate-900">
-          Simple, Fast, and Secure{' '}
+          Fast, Secure, Local-First {' '}
           <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Image & PDF Tools
+            Image Utilities
           </span>
         </h1>
         
         <p className="text-lg text-slate-600 leading-relaxed font-medium">
-          QuickTools handles resizing, cropping, and PDF formatting directly on your device. Zero uploads. Zero latency. Just pure performance for your daily document requirements.
-        </p>
+Resize images, create passport photos, and crop signatures instantly in your browser — with zero uploads and complete privacy.         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs font-bold text-slate-500">
           <div className="flex items-center space-x-1.5">
