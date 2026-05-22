@@ -5,6 +5,8 @@ import PassportPhoto from './pages/PassportPhoto';
 import ResizeImage from './pages/ResizeImage';
 import SignatureCropper from './pages/SignatureCropper';
 import './App.css';
+import { Analytics } from '@vercel/analytics/next';
+
 
 function App() {
   return (
