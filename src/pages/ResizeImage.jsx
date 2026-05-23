@@ -1,270 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, Download, Image as ImageIcon, Sliders, RefreshCw, AlertCircle, Zap, X } from 'lucide-react';
 import SEO from '../components/SEO';
-import { isSupportedImageFile } from '../utils/fileValidation';
+import ResizeTool from '../components/ResizeTool';
 
 export default function ResizeImage() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [targetKb, setTargetKb] = useState(50);
-  const [compressing, setCompressing] = useState(false);
-  const [compressedResult, setCompressedResult] = useState(null);
-  const [error, setError] = useState(null);
-  const [dragActive, setDragActive] = useState(false);
-  
-  const fileInputRef = useRef(null);
-  const fileInputId = 'resize-image-file-input';
-
-  // Test mode helper to mock image uploads in headless browser runs
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('test') === 'true') {
-      const mockBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAExJREFUeNrs0UENAAAMwzCdff9O7+ACWshkpqoCDmRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQcDgEGAM5KAAHO4G9kAAAAAElFTkSuQmCC';
-      fetch(mockBase64)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], 'mock_image.png', { type: 'image/png' });
-          setSelectedFile(file);
-          setPreviewUrl(mockBase64);
-        });
-    }
-  }, []);
-
-  // Track previous object URLs to revoke them and prevent memory leaks
-  const prevPreviewUrlRef = useRef(null);
-  const prevCompressedUrlRef = useRef(null);
-
-  useEffect(() => {
-    if (previewUrl) {
-      if (prevPreviewUrlRef.current && prevPreviewUrlRef.current !== previewUrl) {
-        URL.revokeObjectURL(prevPreviewUrlRef.current);
-      }
-      prevPreviewUrlRef.current = previewUrl;
-    } else {
-      if (prevPreviewUrlRef.current) {
-        URL.revokeObjectURL(prevPreviewUrlRef.current);
-        prevPreviewUrlRef.current = null;
-      }
-    }
-  }, [previewUrl]);
-
-  useEffect(() => {
-    if (compressedResult?.url) {
-      if (prevCompressedUrlRef.current && prevCompressedUrlRef.current !== compressedResult.url) {
-        URL.revokeObjectURL(prevCompressedUrlRef.current);
-      }
-      prevCompressedUrlRef.current = compressedResult.url;
-    } else {
-      if (prevCompressedUrlRef.current) {
-        URL.revokeObjectURL(prevCompressedUrlRef.current);
-        prevCompressedUrlRef.current = null;
-      }
-    }
-  }, [compressedResult]);
-
-  useEffect(() => {
-    return () => {
-      if (prevPreviewUrlRef.current) {
-        URL.revokeObjectURL(prevPreviewUrlRef.current);
-      }
-      if (prevCompressedUrlRef.current) {
-        URL.revokeObjectURL(prevCompressedUrlRef.current);
-      }
-    };
-  }, []);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    try {
-      validateAndProcessFile(file);
-    } catch (err) {
-      setError(`Could not load selected image: ${err.message}`);
-      setSelectedFile(null);
-      setPreviewUrl(null);
-      setCompressedResult(null);
-    }
-  };
-
-  const validateAndProcessFile = (file) => {
-    setError(null);
-    if (!file) return;
-
-    if (!isSupportedImageFile(file)) {
-      setError('Unsupported file format. Please upload a JPG, JPEG, PNG, or WEBP image.');
-      setSelectedFile(null);
-      setPreviewUrl(null);
-      setCompressedResult(null);
-      return;
-    }
-
-    if (file.size > 12 * 1024 * 1024) {
-      setError('The selected file is too large (above 12 MB). Please select an image under 12 MB to ensure fast client-side performance.');
-      setSelectedFile(null);
-      setPreviewUrl(null);
-      setCompressedResult(null);
-      return;
-    }
-
-    setSelectedFile(file);
-    setError(null);
-    setCompressedResult(null);
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    const file = e.dataTransfer.files[0];
-    validateAndProcessFile(file);
-  };
-
-  // Perform iterative compression to reach target KB
-  async function compressImage(file, targetKbValue) {
-    setCompressing(true);
-    setError(null);
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onerror = () => {
-      setError('Could not read the selected image. Please try a different file.');
-      setCompressing(false);
-    };
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onerror = () => {
-        setError('Could not load the selected image. Please try a different JPG, PNG, or WEBP file.');
-        setCompressing(false);
-      };
-      img.onload = async () => {
-        try {
-          const targetBytes = targetKbValue * 1024;
-          let minQuality = 0.05;
-          let maxQuality = 0.98;
-          let quality = 0.75;
-          let scale = 1.0;
-          let iteration = 0;
-          let bestBlob = null;
-          let bestSize = Infinity;
-          let bestQuality = quality;
-          let bestScale = scale;
-
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-
-          // Iterative binary search for quality & step-down scaling if needed
-          while (iteration < 12) {
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            const blob = await new Promise((resolve) => {
-              canvas.toBlob((b) => resolve(b), 'image/jpeg', quality);
-            });
-
-            if (!blob) break;
-
-            const size = blob.size;
-
-            // Keep track of the closest result that is under or near the target
-            if (size <= targetBytes && (bestBlob === null || size > bestBlob.size)) {
-              bestBlob = blob;
-              bestSize = size;
-              bestQuality = quality;
-              bestScale = scale;
-            }
-
-            if (size > targetBytes) {
-              if (quality > 0.15) {
-                maxQuality = quality;
-                quality = (minQuality + quality) / 2;
-              } else {
-                scale *= 0.85;
-                minQuality = 0.05;
-                maxQuality = 0.95;
-                quality = 0.6;
-              }
-            } else {
-              minQuality = quality;
-              quality = (maxQuality + quality) / 2;
-            }
-
-            iteration++;
-          }
-
-          // If no blob was found under the target size, use the last one (smallest possible)
-          if (!bestBlob) {
-            canvas.width = img.width * 0.4;
-            canvas.height = img.height * 0.4;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            bestBlob = await new Promise((resolve) => {
-              canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.1);
-            });
-            bestSize = bestBlob.size;
-            bestQuality = 0.1;
-            bestScale = 0.4;
-          }
-
-          const resultUrl = URL.createObjectURL(bestBlob);
-          setCompressedResult({
-            url: resultUrl,
-            sizeBytes: bestSize,
-            sizeKb: parseFloat((bestSize / 1024).toFixed(1)),
-            quality: bestQuality,
-            scale: bestScale,
-            width: Math.round(img.width * bestScale),
-            height: Math.round(img.height * bestScale),
-          });
-          
-          if (bestSize > targetBytes) {
-            setError(`Could not compress fully below ${targetKbValue} KB without excessive quality loss. Best output is ${ (bestSize/1024).toFixed(1) } KB.`);
-          }
-        } catch (err) {
-          console.error(err);
-          setError('An error occurred during compression.');
-        } finally {
-          setCompressing(false);
-        }
-      };
-    };
-  }
-
-  // Auto-compress useEffect when image or target KB changes
-  useEffect(() => {
-    if (!selectedFile) return;
-
-    const delayDebounceFn = setTimeout(() => {
-      compressImage(selectedFile, targetKb);
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [selectedFile, targetKb]);
-
-  // downloadCompressed is handled natively via <a> element now
-
-  const resetAll = () => {
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    setCompressedResult(null);
-    setError(null);
-  };
-
   return (
     <>
       <SEO
@@ -272,324 +10,74 @@ export default function ResizeImage() {
         description="Compress and resize images to exact KB limits in your browser with privacy-first local processing. Great for portal uploads, forms, and ID requirements."
       />
       <div className="max-w-5xl mx-auto space-y-8 py-4">
-      {/* Header */}
-      <div className="space-y-3">
-        <h1 className="text-3xl font-extrabold text-slate-900">Resize Image to Target KB</h1>
-        <p className="text-slate-600 text-sm">
-          Optimize and compress your image files directly to your requested size. Excellent for online admission portals, passport forms, and visa applications that require files under a specific limit (e.g. 50 KB or 100 KB).
-        </p>
-      </div>
-
-      {/* Main workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Config and Upload Column */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 space-y-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-              <Sliders className="h-5 w-5 text-indigo-600" />
-              <span>Compression Settings</span>
-            </h2>
-
-            {/* Target KB slider/input */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <label className="text-sm text-slate-700 font-bold">Target Size Limit:</label>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="number"
-                    value={targetKb}
-                    onChange={(e) => setTargetKb(Math.max(1, parseInt(e.target.value) || 0))}
-                    className="w-20 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-right text-indigo-600 font-extrabold text-sm focus:outline-none focus:border-indigo-500"
-                  />
-                  <span className="text-sm text-slate-400 font-bold">KB</span>
-                </div>
-              </div>
-
-              <input
-                type="range"
-                min="10"
-                max="500"
-                step="5"
-                value={targetKb}
-                onChange={(e) => setTargetKb(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-              />
-              <div className="flex justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                <span>Min: 10 KB</span>
-                <span>Max: 500 KB</span>
-              </div>
-            </div>
-
-            {/* Preset Buttons */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Size Presets:</label>
-              <div className="grid grid-cols-4 gap-2">
-                {[20, 50, 100, 200].map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setTargetKb(size)}
-                    className={`py-2 px-1 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-sm text-center ${
-                      targetKb === size
-                        ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 shadow-md ring-2 ring-indigo-600/20'
-                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                    }`}
-                  >
-                    {size} KB
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Upload Area */}
-            <div className="space-y-2">
-              <label className="text-sm text-slate-700 font-bold">Upload Image:</label>
-              <label
-                htmlFor={fileInputId}
-                onDragEnter={handleDrag}
-                onDragOver={handleDrag}
-                onDragLeave={handleDrag}
-                onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center space-y-3 group ${
-                  dragActive
-                    ? 'border-indigo-600 bg-indigo-50/50 scale-[0.99]'
-                    : 'border-slate-300 bg-white hover:bg-slate-50'
-                }`}
-              >
-                <input
-                  id={fileInputId}
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                  className="sr-only"
-                  aria-label="Choose an image"
-                />
-                <span className="inline-flex px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs transition-colors duration-200 shadow-sm">
-                  Choose Image
-                </span>
-                
-                <div className="p-3 bg-slate-100 group-hover:bg-indigo-600 rounded-xl text-slate-500 group-hover:text-white transition-all duration-300">
-                  <Upload className="h-6 w-6" />
-                </div>
-                
-                <div>
-                  <p className="text-sm font-bold text-slate-800">
-                    {selectedFile ? selectedFile.name : 'Select or drag an image'}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Supports JPG, PNG, WebP
-                  </p>
-                </div>
-
-                {selectedFile && (
-                  <span className="text-xs px-2.5 py-0.5 bg-slate-100 text-slate-600 rounded-md font-bold border border-slate-200/80">
-                    {(selectedFile.size / 1024).toFixed(1)} KB
-                  </span>
-                )}
-              </label>
-            </div>
-
-            {/* Actions / Reset */}
-            {selectedFile && (
-              <button
-                onClick={resetAll}
-                className="w-full py-2.5 px-4 rounded-xl border border-red-200 hover:border-red-300 bg-white hover:bg-red-50/20 text-red-600 font-bold text-xs transition-colors duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-                <span>Remove Image</span>
-              </button>
-            )}
-
-            {/* Info Message */}
-            <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl flex items-start space-x-2 text-xs text-indigo-800 font-semibold leading-relaxed">
-              <Zap className="h-4 w-4 text-indigo-600 shrink-0 mt-0.5" />
-              <span>
-                Offline Processing: Images are compressed entirely inside your web browser. No server uploads occur.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Preview and Results Column */}
-        <div className="lg:col-span-7 flex flex-col">
-          {previewUrl ? (
-            <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 flex-grow flex flex-col justify-between space-y-6 shadow-sm">
-              
-              {/* Display side-by-side or stacked results */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-grow">
-                {/* Original Preview */}
-                <div className="flex flex-col space-y-2">
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-slate-400">
-                    <span>Original Image</span>
-                    <span className="text-slate-600 font-bold">
-                      {selectedFile ? (selectedFile.size / 1024).toFixed(1) : 0} KB
-                    </span>
-                  </div>
-                  <div className="relative border border-slate-200 bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center p-2 h-64 sm:h-80">
-                    <img
-                      src={previewUrl}
-                      alt="Original source"
-                      className="max-w-full max-h-full object-contain rounded-lg"
-                    />
-                  </div>
-                </div>
-
-                {/* Compressed Preview */}
-                <div className="flex flex-col space-y-2">
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-slate-400">
-                    <span>Target: {targetKb} KB</span>
-                    {compressedResult ? (
-                      <span className={`font-extrabold ${parseInt(compressedResult.sizeKb) <= targetKb ? 'text-emerald-600' : 'text-amber-600'}`}>
-                        {compressedResult.sizeKb} KB
-                      </span>
-                    ) : (
-                      <span>-- KB</span>
-                    )}
-                  </div>
-                  
-                  <div className="relative border border-slate-200 bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center p-2 h-64 sm:h-80">
-                    {compressing ? (
-                      <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center space-y-3 z-10">
-                        <RefreshCw className="h-8 w-8 text-indigo-600 animate-spin" />
-                        <span className="text-xs text-indigo-600 font-bold tracking-wide uppercase">Optimizing Pixels...</span>
-                      </div>
-                    ) : null}
-
-                    {compressedResult ? (
-                      <img
-                        src={compressedResult.url}
-                        alt="Compressed output"
-                        className="max-w-full max-h-full object-contain rounded-lg"
-                      />
-                    ) : (
-                      <div className="text-slate-400 text-xs flex flex-col items-center space-y-2 font-semibold">
-                        <ImageIcon className="h-8 w-8 text-slate-300" />
-                        <span>Optimizing results...</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Compression stats / feedback */}
-              {compressedResult && (
-                <div className="bg-slate-100/50 border border-slate-200 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-4">
-                  <div className="flex items-center space-x-6">
-                    <div>
-                      <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">New Resolution</div>
-                      <div className="text-sm font-bold text-slate-800">
-                        {compressedResult.width} × {compressedResult.height} px
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Quality Level</div>
-                      <div className="text-sm font-bold text-slate-800">
-                        {Math.round(compressedResult.quality * 100)}%
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Reduction Ratio</div>
-                      <div className="text-sm font-extrabold text-emerald-600">
-                        {selectedFile ? ((1 - compressedResult.sizeBytes / selectedFile.size) * 100).toFixed(0) : 0}% smaller
-                      </div>
-                    </div>
-                  </div>
-
-                  <a
-                    href={compressedResult.url}
-                    download={`resized_${targetKb}kb_${selectedFile.name.split('.')[0]}.jpg`}
-                    className="py-3 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-colors duration-200 flex items-center space-x-2 shadow-lg shadow-emerald-600/10 cursor-pointer text-center"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Download Resized JPG</span>
-                  </a>
-                </div>
-              )}
-
-              {error && (
-                <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-2xl flex items-start space-x-2 text-xs font-semibold">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-              
-            </div>
-          ) : (
-            <div className="glass-panel border-dashed border-slate-300 hover:border-slate-400 rounded-3xl p-12 text-center h-full flex flex-col justify-center items-center space-y-4 shadow-sm min-h-[300px]">
-              <div className="bg-white p-4 rounded-full text-slate-400 border border-slate-200/80 shadow-sm">
-                <ImageIcon className="h-10 w-10" />
-              </div>
-              <div className="max-w-xs space-y-1">
-                <p className="text-slate-800 text-sm font-bold">No Image Uploaded</p>
-                <p className="text-slate-500 text-xs font-semibold">
-                  Upload an image on the left, select your file limit, and we'll instantly optimize it.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">
-        <div>
-          <h2 id="resize-overview" className="text-2xl font-bold text-slate-900">Resize Image Tool Overview</h2>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Resize Image Tool lets you reduce photo file size instantly in the browser. Keep the image private with local-only processing and avoid server uploads for application forms and online portals.
+        <div className="space-y-3">
+          <h1 className="text-3xl font-extrabold text-slate-900">Resize Image to Target KB</h1>
+          <p className="text-slate-600 text-sm">
+            Optimize and compress your image files directly to your requested size. Excellent for online admission portals, passport forms, and visa applications that require files under a specific limit (e.g. 50 KB or 100 KB).
           </p>
         </div>
 
-        <section aria-labelledby="resize-features" className="space-y-4">
-          <h3 id="resize-features" className="text-xl font-semibold text-slate-900">Features</h3>
-          <ul className="space-y-3 text-sm text-slate-600">
-            <li className="list-disc list-inside">Precise target KB compression for 20, 50, 100, or 200 KB limits.</li>
-            <li className="list-disc list-inside">Fast local processing with quality-first binary search compression.</li>
-            <li className="list-disc list-inside">Preview original and compressed output side-by-side.</li>
-            <li className="list-disc list-inside">No uploads, no external servers, no privacy leaks.</li>
-          </ul>
-        </section>
+        <ResizeTool defaultTargetKb={50} />
 
-        <section aria-labelledby="resize-usage" className="space-y-4">
-          <h3 id="resize-usage" className="text-xl font-semibold text-slate-900">How to Use</h3>
-          <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600">
-            <li>Upload a JPG, PNG, or WEBP image using the file picker or drag-and-drop.</li>
-            <li>Select your desired maximum file size from the preset options or choose a custom limit.</li>
-            <li>Wait for the browser to generate the optimized preview.</li>
-            <li>Download the compressed image directly to your device.</li>
-          </ol>
-        </section>
-
-        <section aria-labelledby="resize-faq" className="space-y-4">
-          <h3 id="resize-faq" className="text-xl font-semibold text-slate-900">FAQ</h3>
-          <div className="space-y-4 text-sm text-slate-600">
-            <div>
-              <p className="font-semibold text-slate-900">Will my image be uploaded?</p>
-              <p>No. Compression happens completely inside your browser, and the image is never sent to any server.</p>
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900">What file sizes work best?</p>
-              <p>Most JPG, PNG, and WEBP photos under 12 MB work well for local compression and preview generation.</p>
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900">Can I use this for online forms?</p>
-              <p>Yes. The tool is ideal for portals and applications that require exact KB limits and fast client-side workflow.</p>
-            </div>
+        <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">
+          <div>
+            <h2 id="resize-overview" className="text-2xl font-bold text-slate-900">Resize Image Tool Overview</h2>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Resize Image Tool lets you reduce photo file size instantly in the browser. Keep the image private with local-only processing and avoid server uploads for application forms and online portals.
+            </p>
           </div>
-        </section>
 
-        <section aria-labelledby="resize-related" className="space-y-4">
-          <h3 id="resize-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
-          <p className="text-sm text-slate-600">Need official passport dimensions or a clean signature export? These tools are built for the same no-upload privacy-first experience.</p>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
-            <li>
-              <Link to="/passport-photo" className="text-indigo-600 hover:underline">Passport Size Photo Maker</Link>
-            </li>
-            <li>
-              <Link to="/signature-cropper" className="text-indigo-600 hover:underline">Signature Cropper</Link>
-            </li>
-          </ul>
+          <section aria-labelledby="resize-features" className="space-y-4">
+            <h3 id="resize-features" className="text-xl font-semibold text-slate-900">Features</h3>
+            <ul className="space-y-3 text-sm text-slate-600">
+              <li className="list-disc list-inside">Precise target KB compression for 20, 50, 100, or 200 KB limits.</li>
+              <li className="list-disc list-inside">Fast local processing with quality-first binary search compression.</li>
+              <li className="list-disc list-inside">Preview original and compressed output side-by-side.</li>
+              <li className="list-disc list-inside">No uploads, no external servers, no privacy leaks.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="resize-usage" className="space-y-4">
+            <h3 id="resize-usage" className="text-xl font-semibold text-slate-900">How to Use</h3>
+            <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600">
+              <li>Upload a JPG, PNG, or WEBP image using the file picker or drag-and-drop.</li>
+              <li>Select your desired maximum file size from the preset options or choose a custom limit.</li>
+              <li>Wait for the browser to generate the optimized preview.</li>
+              <li>Download the compressed image directly to your device.</li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="resize-faq" className="space-y-4">
+            <h3 id="resize-faq" className="text-xl font-semibold text-slate-900">FAQ</h3>
+            <div className="space-y-4 text-sm text-slate-600">
+              <div>
+                <p className="font-semibold text-slate-900">Will my image be uploaded?</p>
+                <p>No. Compression happens completely inside your browser, and the image is never sent to any server.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900">What file sizes work best?</p>
+                <p>Most JPG, PNG, and WEBP photos under 12 MB work well for local compression and preview generation.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900">Can I use this for online forms?</p>
+                <p>Yes. The tool is ideal for portals and applications that require exact KB limits and fast client-side workflow.</p>
+              </div>
+            </div>
+          </section>
+
+          <section aria-labelledby="resize-related" className="space-y-4">
+            <h3 id="resize-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
+            <p className="text-sm text-slate-600">Need official passport dimensions or a clean signature export? These tools are built for the same no-upload privacy-first experience.</p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
+              <li>
+                <Link to="/passport-photo" className="text-indigo-600 hover:underline">Passport Size Photo Maker</Link>
+              </li>
+              <li>
+                <Link to="/signature-cropper" className="text-indigo-600 hover:underline">Signature Cropper</Link>
+              </li>
+            </ul>
+          </section>
         </section>
-      </section>
       </div>
     </>
   );

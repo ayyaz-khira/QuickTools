@@ -110,6 +110,32 @@ Resize images, create passport photos, and crop signatures instantly in your bro
                     </li>
                   ))}
                 </ul>
+
+                {tool.name === 'Resize Image to KB' ? (
+                  <div className="space-y-3 mb-6">
+                    <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Quick access</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Link
+                        to="/resize-image-to-20kb"
+                        className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-2xl py-2 text-center hover:bg-slate-200 transition"
+                      >
+                        Resize to 20KB
+                      </Link>
+                      <Link
+                        to="/resize-image-to-50kb"
+                        className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-2xl py-2 text-center hover:bg-slate-200 transition"
+                      >
+                        Resize to 50KB
+                      </Link>
+                      <Link
+                        to="/resize-image-to-100kb"
+                        className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-2xl py-2 text-center hover:bg-slate-200 transition"
+                      >
+                        Resize to 100KB
+                      </Link>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               <Link
