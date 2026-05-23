@@ -876,19 +876,6 @@ export default function PassportPhoto() {
             </div>
           </div>
         </section>
-
-        <section aria-labelledby="passport-related" className="space-y-4">
-          <h3 id="passport-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
-          <p className="text-sm text-slate-600">Need a smaller upload-ready file or a clean signature asset? Try our related browser tools.</p>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
-            <li>
-              <Link to="/resize-image" className="text-indigo-600 hover:underline">Resize Image Tool</Link>
-            </li>
-            <li>
-              <Link to="/signature-cropper" className="text-indigo-600 hover:underline">Signature Cropper</Link>
-            </li>
-          </ul>
-        </section>
       </section>
       </div>
     </>

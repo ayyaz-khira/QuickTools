@@ -40,35 +40,6 @@ export default function ResizeImageSeo({ targetKb }) {
           <p className="text-slate-600 text-sm leading-relaxed">{config.intro}</p>
         </div>
 
-        <section aria-labelledby="related-sizes" className="glass-panel rounded-3xl p-6 border border-slate-200/60 shadow-sm">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h2 id="related-sizes" className="text-lg font-semibold text-slate-900">Related Sizes</h2>
-              <p className="text-sm text-slate-500 mt-1">Jump directly to the most popular target size pages.</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link
-                to="/resize-image-to-20kb"
-                className="text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200 rounded-full px-3 py-2 hover:bg-slate-200 transition"
-              >
-                20KB
-              </Link>
-              <Link
-                to="/resize-image-to-50kb"
-                className="text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200 rounded-full px-3 py-2 hover:bg-slate-200 transition"
-              >
-                50KB
-              </Link>
-              <Link
-                to="/resize-image-to-100kb"
-                className="text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200 rounded-full px-3 py-2 hover:bg-slate-200 transition"
-              >
-                100KB
-              </Link>
-            </div>
-          </div>
-        </section>
-
         <ResizeTool defaultTargetKb={targetKb} />
 
         <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">

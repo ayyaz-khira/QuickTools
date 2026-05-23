@@ -64,19 +64,6 @@ export default function ResizeImage() {
               </div>
             </div>
           </section>
-
-          <section aria-labelledby="resize-related" className="space-y-4">
-            <h3 id="resize-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
-            <p className="text-sm text-slate-600">Need official passport dimensions or a clean signature export? These tools are built for the same no-upload privacy-first experience.</p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
-              <li>
-                <Link to="/passport-photo" className="text-indigo-600 hover:underline">Passport Size Photo Maker</Link>
-              </li>
-              <li>
-                <Link to="/signature-cropper" className="text-indigo-600 hover:underline">Signature Cropper</Link>
-              </li>
-            </ul>
-          </section>
         </section>
       </div>
     </>

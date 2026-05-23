@@ -568,19 +568,6 @@ export default function SignatureCropper() {
             </div>
           </div>
         </section>
-
-        <section aria-labelledby="signature-related" className="space-y-4">
-          <h3 id="signature-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
-          <p className="text-sm text-slate-600">For passport photo formatting or precise file-size compression, use our other locally-run utility pages.</p>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
-            <li>
-                <Link to="/passport-photo" className="text-indigo-600 hover:underline">Passport Size Photo Maker</Link>
-            </li>
-            <li>
-              <Link to="/resize-image" className="text-indigo-600 hover:underline">Resize Image Tool</Link>
-            </li>
-          </ul>
-        </section>
       </section>
       </div>
     </>

@@ -33,6 +33,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/compress-image" className="hover:text-indigo-600 transition-colors">
+                Compress Image
+              </Link>
+            </li>
+            <li>
               <Link to="/signature-cropper" className="hover:text-indigo-600 transition-colors">
                 Signature Cropper
               </Link>

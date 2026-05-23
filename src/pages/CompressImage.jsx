@@ -58,25 +58,6 @@ export default function CompressImage() {
               </div>
             </div>
           </section>
-
-          <section aria-labelledby="compress-related" className="space-y-4">
-            <h3 id="compress-related" className="text-xl font-semibold text-slate-900">Related QuickTools</h3>
-            <p className="text-sm text-slate-600">Explore more image utilities built for privacy-first browser processing.</p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
-              <li>
-                <Link to="/resize-image" className="text-indigo-600 hover:underline">Resize Image Tool</Link>
-              </li>
-              <li>
-                <Link to="/passport-photo" className="text-indigo-600 hover:underline">Passport Size Photo Maker</Link>
-              </li>
-              <li>
-                <Link to="/signature-cropper" className="text-indigo-600 hover:underline">Signature Cropper</Link>
-              </li>
-              <li>
-                <Link to="/resize-image-to-50kb" className="text-indigo-600 hover:underline">Resize to 50KB</Link>
-              </li>
-            </ul>
-          </section>
         </section>
       </div>
     </>
