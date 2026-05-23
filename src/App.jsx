@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import PassportPhoto from './pages/PassportPhoto';
 import ResizeImage from './pages/ResizeImage';
 import ResizeImageSeo from './pages/ResizeImageSeo';
+import CompressImage from './pages/CompressImage';
 import SignatureCropper from './pages/SignatureCropper';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/passport-photo" element={<PassportPhoto />} />
           <Route path="/resize-image" element={<ResizeImage />} />
+          <Route path="/compress-image" element={<CompressImage />} />
           <Route path="/resize-image-to-20kb" element={<ResizeImageSeo targetKb={20} />} />
           <Route path="/resize-image-to-50kb" element={<ResizeImageSeo targetKb={50} />} />
           <Route path="/resize-image-to-100kb" element={<ResizeImageSeo targetKb={100} />} />

@@ -132,6 +132,9 @@ export default function ResizeImageSeo({ targetKb }) {
               <li>
                 <Link to="/signature-cropper" className="text-indigo-600 hover:underline">Signature Cropper</Link>
               </li>
+              <li>
+                <Link to="/compress-image" className="text-indigo-600 hover:underline">Compress Image</Link>
+              </li>
             </ul>
           </section>
         </section>

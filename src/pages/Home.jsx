@@ -134,6 +134,14 @@ Resize images, create passport photos, and crop signatures instantly in your bro
                         Resize to 100KB
                       </Link>
                     </div>
+                    <div className="pt-2">
+                      <Link
+                        to="/compress-image"
+                        className="text-xs font-semibold text-indigo-700 border border-indigo-100 bg-indigo-50 rounded-2xl px-3 py-2 inline-flex items-center justify-center hover:bg-indigo-100 transition"
+                      >
+                        Compress Image
+                      </Link>
+                    </div>
                   </div>
                 ) : null}
               </div>

@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { Upload, Download, Image as ImageIcon, Sliders, RefreshCw, AlertCircle, Zap, X } from 'lucide-react';
 import { isSupportedImageFile } from '../utils/fileValidation';
 
-export default function ResizeTool({ defaultTargetKb = 50 }) {
+export default function ResizeTool({ mode = 'resize', defaultTargetKb = 50, defaultQuality = 0.75 }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [targetKb, setTargetKb] = useState(defaultTargetKb);
+  const [quality, setQuality] = useState(defaultQuality);
   const [compressing, setCompressing] = useState(false);
   const [compressedResult, setCompressedResult] = useState(null);
   const [error, setError] = useState(null);
@@ -17,6 +18,10 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
   useEffect(() => {
     setTargetKb(defaultTargetKb);
   }, [defaultTargetKb]);
+
+  useEffect(() => {
+    setQuality(defaultQuality);
+  }, [defaultQuality]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -128,7 +133,7 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
     validateAndProcessFile(file);
   };
 
-  async function compressImage(file, targetKbValue) {
+  async function compressImage(file, targetKbValue, qualityValue = 0.75) {
     setCompressing(true);
     setError(null);
 
@@ -147,70 +152,88 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
       };
       img.onload = async () => {
         try {
-          const targetBytes = targetKbValue * 1024;
-          let minQuality = 0.05;
-          let maxQuality = 0.98;
-          let quality = 0.75;
-          let scale = 1.0;
-          let iteration = 0;
-          let bestBlob = null;
-          let bestSize = Infinity;
-          let bestQuality = quality;
-          let bestScale = scale;
-
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          while (iteration < 12) {
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          let bestBlob = null;
+          let bestSize = Infinity;
+          let bestQuality = qualityValue;
+          let bestScale = 1.0;
 
+          if (mode === 'compress') {
             const blob = await new Promise((resolve) => {
-              canvas.toBlob((b) => resolve(b), 'image/jpeg', quality);
+              canvas.toBlob((b) => resolve(b), 'image/jpeg', qualityValue);
             });
 
-            if (!blob) break;
-
-            const size = blob.size;
-
-            if (size <= targetBytes && (bestBlob === null || size > bestBlob.size)) {
-              bestBlob = blob;
-              bestSize = size;
-              bestQuality = quality;
-              bestScale = scale;
+            if (!blob) {
+              throw new Error('Compression failed.');
             }
 
-            if (size > targetBytes) {
-              if (quality > 0.15) {
-                maxQuality = quality;
-                quality = (minQuality + quality) / 2;
-              } else {
-                scale *= 0.85;
-                minQuality = 0.05;
-                maxQuality = 0.95;
-                quality = 0.6;
+            bestBlob = blob;
+            bestSize = blob.size;
+          } else {
+            const targetBytes = targetKbValue * 1024;
+            let minQuality = 0.05;
+            let maxQuality = 0.98;
+            let qualitySearch = 0.75;
+            let scale = 1.0;
+            let iteration = 0;
+
+            while (iteration < 12) {
+              canvas.width = img.width * scale;
+              canvas.height = img.height * scale;
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              const blob = await new Promise((resolve) => {
+                canvas.toBlob((b) => resolve(b), 'image/jpeg', qualitySearch);
+              });
+
+              if (!blob) break;
+
+              const size = blob.size;
+
+              if (size <= targetBytes && (bestBlob === null || size > bestBlob.size)) {
+                bestBlob = blob;
+                bestSize = size;
+                bestQuality = qualitySearch;
+                bestScale = scale;
               }
-            } else {
-              minQuality = quality;
-              quality = (maxQuality + quality) / 2;
+
+              if (size > targetBytes) {
+                if (qualitySearch > 0.15) {
+                  maxQuality = qualitySearch;
+                  qualitySearch = (minQuality + qualitySearch) / 2;
+                } else {
+                  scale *= 0.85;
+                  minQuality = 0.05;
+                  maxQuality = 0.95;
+                  qualitySearch = 0.6;
+                }
+              } else {
+                minQuality = qualitySearch;
+                qualitySearch = (maxQuality + qualitySearch) / 2;
+              }
+
+              iteration++;
             }
 
-            iteration++;
-          }
-
-          if (!bestBlob) {
-            canvas.width = img.width * 0.4;
-            canvas.height = img.height * 0.4;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            bestBlob = await new Promise((resolve) => {
-              canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.1);
-            });
-            bestSize = bestBlob.size;
-            bestQuality = 0.1;
-            bestScale = 0.4;
+            if (!bestBlob) {
+              canvas.width = img.width * 0.4;
+              canvas.height = img.height * 0.4;
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              bestBlob = await new Promise((resolve) => {
+                canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.1);
+              });
+              bestSize = bestBlob.size;
+              bestQuality = 0.1;
+              bestScale = 0.4;
+            }
           }
 
           const resultUrl = URL.createObjectURL(bestBlob);
@@ -224,7 +247,7 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
             height: Math.round(img.height * bestScale),
           });
 
-          if (bestSize > targetBytes) {
+          if (mode !== 'compress' && bestSize > targetKbValue * 1024) {
             setError(`Could not compress fully below ${targetKbValue} KB without excessive quality loss. Best output is ${(bestSize / 1024).toFixed(1)} KB.`);
           }
         } catch (err) {
@@ -241,11 +264,15 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
     if (!selectedFile) return;
 
     const delayDebounceFn = setTimeout(() => {
-      compressImage(selectedFile, targetKb);
+      if (mode === 'compress') {
+        compressImage(selectedFile, targetKb, quality);
+      } else {
+        compressImage(selectedFile, targetKb);
+      }
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [selectedFile, targetKb]);
+  }, [selectedFile, targetKb, quality, mode]);
 
   const resetAll = () => {
     setSelectedFile(null);
@@ -264,51 +291,77 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
           </h2>
 
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className="text-sm text-slate-700 font-bold">Target Size Limit:</label>
-              <div className="flex items-center space-x-2">
+            {mode === 'compress' ? (
+              <>
+                <div className="flex justify-between items-center">
+                  <label className="text-sm text-slate-700 font-bold">Quality Setting:</label>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-indigo-600 font-extrabold">{Math.round(quality * 100)}%</span>
+                  </div>
+                </div>
+
                 <input
-                  type="number"
-                  value={targetKb}
-                  onChange={(e) => setTargetKb(Math.max(1, parseInt(e.target.value) || 0))}
-                  className="w-20 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-right text-indigo-600 font-extrabold text-sm focus:outline-none focus:border-indigo-500"
+                  type="range"
+                  min="0.1"
+                  max="1"
+                  step="0.05"
+                  value={quality}
+                  onChange={(e) => setQuality(parseFloat(e.target.value))}
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
-                <span className="text-sm text-slate-400 font-bold">KB</span>
-              </div>
-            </div>
+                <div className="text-xs text-slate-500">
+                  Adjust quality to compress images while maintaining the best possible visual result.
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-between items-center">
+                  <label className="text-sm text-slate-700 font-bold">Target Size Limit:</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      value={targetKb}
+                      onChange={(e) => setTargetKb(Math.max(1, parseInt(e.target.value) || 0))}
+                      className="w-20 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-right text-indigo-600 font-extrabold text-sm focus:outline-none focus:border-indigo-500"
+                    />
+                    <span className="text-sm text-slate-400 font-bold">KB</span>
+                  </div>
+                </div>
 
-            <input
-              type="range"
-              min="10"
-              max="500"
-              step="5"
-              value={targetKb}
-              onChange={(e) => setTargetKb(parseInt(e.target.value))}
-              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-              <span>Min: 10 KB</span>
-              <span>Max: 500 KB</span>
-            </div>
-          </div>
+                <input
+                  type="range"
+                  min="10"
+                  max="500"
+                  step="5"
+                  value={targetKb}
+                  onChange={(e) => setTargetKb(parseInt(e.target.value))}
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                />
+                <div className="flex justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                  <span>Min: 10 KB</span>
+                  <span>Max: 500 KB</span>
+                </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Size Presets:</label>
-            <div className="grid grid-cols-4 gap-2">
-              {[20, 50, 100, 200].map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setTargetKb(size)}
-                  className={`py-2 px-1 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-sm text-center ${
-                    targetKb === size
-                      ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 shadow-md ring-2 ring-indigo-600/20'
-                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                  }`}
-                >
-                  {size} KB
-                </button>
-              ))}
-            </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Size Presets:</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[20, 50, 100, 200].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setTargetKb(size)}
+                        className={`py-2 px-1 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-sm text-center ${
+                          targetKb === size
+                            ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 shadow-md ring-2 ring-indigo-600/20'
+                            : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
+                        }`}
+                      >
+                        {size} KB
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -400,13 +453,13 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
 
               <div className="flex flex-col space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-slate-400">
-                  <span>Target: {targetKb} KB</span>
+                  <span>{mode === 'compress' ? 'Quality' : `Target: ${targetKb} KB`}</span>
                   {compressedResult ? (
-                    <span className={`font-extrabold ${parseInt(compressedResult.sizeKb) <= targetKb ? 'text-emerald-600' : 'text-amber-600'}`}>
-                      {compressedResult.sizeKb} KB
+                    <span className={`font-extrabold ${mode === 'compress' ? 'text-emerald-600' : parseInt(compressedResult.sizeKb) <= targetKb ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      {mode === 'compress' ? `${Math.round(quality * 100)}%` : `${compressedResult.sizeKb} KB`}
                     </span>
                   ) : (
-                    <span>-- KB</span>
+                    <span>{mode === 'compress' ? `${Math.round(quality * 100)}%` : '-- KB'}</span>
                   )}
                 </div>
 
@@ -459,11 +512,15 @@ export default function ResizeTool({ defaultTargetKb = 50 }) {
 
                 <a
                   href={compressedResult.url}
-                  download={`resized_${targetKb}kb_${selectedFile.name.split('.')[0]}.jpg`}
+                  download={
+                    mode === 'compress'
+                      ? `compressed_${Math.round(quality * 100)}pct_${selectedFile.name.split('.')[0]}.jpg`
+                      : `resized_${targetKb}kb_${selectedFile.name.split('.')[0]}.jpg`
+                  }
                   className="py-3 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-colors duration-200 flex items-center space-x-2 shadow-lg shadow-emerald-600/10 cursor-pointer text-center"
                 >
                   <Download className="h-4 w-4" />
-                  <span>Download Resized JPG</span>
+                  <span>{mode === 'compress' ? 'Download Compressed JPG' : 'Download Resized JPG'}</span>
                 </a>
               </div>
             )}
