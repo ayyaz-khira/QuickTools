@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Camera, Image as ImageIcon, CheckSquare, Zap as ZapIcon, ArrowRight, ShieldCheck, Zap, Heart } from 'lucide-react';
+import { Camera, Image as ImageIcon, CheckSquare, Zap as ZapIcon, ArrowRight, ShieldCheck, Zap, Heart, Files } from 'lucide-react';
 import SEO from '../components/SEO';
 
 export default function Home() {
@@ -31,8 +31,15 @@ export default function Home() {
       tag: 'Fast',
       features: ['Quality slider control', 'Real-time file size preview', 'Instant browser processing', 'No server uploads']
     },
-    {
-      name: 'Signature Cropper',
+    {      name: 'Image to PDF',
+      description: 'Convert one or more images into a printable PDF document instantly in your browser with no uploads.',
+      href: '/image-to-pdf',
+      icon: Files,
+      color: 'from-sky-500 to-cyan-500',
+      tag: 'New',
+      features: ['Multi-image PDF export', 'A4-ready page fitting', 'Client-side conversion only', 'Download as PDF instantly']
+    },
+    {      name: 'Signature Cropper',
       description: 'Crop hand-written signatures from scanned papers. Cleans up backgrounds by converting them to solid white and boosting ink contrast.',
       href: '/signature-cropper',
       icon: CheckSquare,

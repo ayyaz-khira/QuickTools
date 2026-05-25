@@ -21,6 +21,10 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quick-tools-theta.vercel.app/image-to-pdf</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quick-tools-theta.vercel.app/resize-image-to-20kb</loc>
     <priority>0.7</priority>
   </url>

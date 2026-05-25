@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Camera, Image as ImageIcon, CheckSquare, Zap, Settings, Menu, X } from 'lucide-react';
+import { Camera, Image as ImageIcon, CheckSquare, Zap, Files, Settings, Menu, X } from 'lucide-react';
 
 export default function Navbar() {
   const location = useLocation();
@@ -10,6 +10,7 @@ export default function Navbar() {
     { name: 'Passport Size Photo Maker', href: '/passport-photo', icon: Camera },
     { name: 'Resize to KB', href: '/resize-image', icon: ImageIcon },
     { name: 'Compress Image', href: '/compress-image', icon: Zap },
+    { name: 'Image to PDF', href: '/image-to-pdf', icon: Files },
     { name: 'Signature Cropper', href: '/signature-cropper', icon: CheckSquare },
   ];
 
