@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
-import { Upload, X, Sliders, RefreshCw, Download, Image as ImageIcon, CheckCircle, AlertCircle, Palette, Maximize, Zap, Printer, FileText, FileImage } from 'lucide-react';
+import { Upload, X, Sliders, RefreshCw, Download, Image as ImageIcon, CheckCircle, AlertCircle, Palette, Maximize, Zap, Printer, FileText, FileImage, ChevronDown } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { getCroppedImg, generatePrintSheetCanvas } from '../utils/cropImage';
 import SEO from '../components/SEO';
@@ -36,22 +35,21 @@ export default function PassportPhoto() {
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [generatingPreview, setGeneratingPreview] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const fileInputRef = useRef(null);
   const fileInputId = 'passport-photo-file-input';
   const sheetCanvasRef = useRef(null);
 
   const presets = [
-    { id: '35x45_mm', name: '35x45 mm (Indian/Schengen Passport)', widthMm: 35, heightMm: 45 },
-    { id: '50x50_mm', name: '50.8x50.8 mm (US Visa / 2x2 Inch)', widthMm: 50.8, heightMm: 50.8 },
+    { id: '35x45_mm', name: '35x45 mm (Indian/Schengen Passport)', label: '35 x 45 mm', helper: 'Indian Passport / Visa', widthMm: 35, heightMm: 45 },
+    { id: '50x50_mm', name: '50.8x50.8 mm (US Visa / 2x2 Inch)', label: '2 x 2 inch', helper: 'US Visa / Passport', widthMm: 50.8, heightMm: 50.8 },
     { id: 'custom', name: 'Custom Size (mm)', widthMm: 35, heightMm: 45 }
   ];
 
   const bgColors = [
     { name: 'White', value: '#ffffff', class: 'bg-white border-slate-300' },
-    { name: 'Blue', value: '#3b82f6', class: 'bg-blue-500 border-blue-600' },
-    { name: 'Red', value: '#ef4444', class: 'bg-red-500 border-red-600' },
-    { name: 'Light Gray', value: '#f1f5f9', class: 'bg-slate-100 border-slate-300' }
+    { name: 'Blue', value: '#3b82f6', class: 'bg-blue-500 border-blue-600' }
   ];
 
   // Resolve active dimension values
@@ -354,19 +352,19 @@ export default function PassportPhoto() {
       />
       <div className="max-w-5xl mx-auto space-y-8 py-4">
         {/* Page Header */}
-      <div className="space-y-3">
-        <h1 className="text-3xl font-extrabold text-slate-900">Passport Size Photo Maker</h1>
-        <p className="text-slate-600 text-sm">
-          Crop, align, recolor backgrounds, and compress passport photos to your exact size guidelines. Complete offline operation ensures 100% privacy.
-        </p>
-      </div>
+	      <div className="space-y-3">
+	        <h1 className="text-3xl font-extrabold text-slate-900">Passport Size Photo Maker</h1>
+	        <p className="text-slate-600 text-sm leading-relaxed">
+	          Upload a portrait, align the crop, choose a background, and download a passport-ready photo or printable sheet. Everything runs privately in your browser.
+	        </p>
+	      </div>
 
       {/* Main Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left Column: Upload / Cropper */}
-        <div className="lg:col-span-7 flex flex-col space-y-6">
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 shadow-sm flex-grow flex flex-col justify-between">
+	        <div className="lg:col-span-7 flex flex-col space-y-6">
+	          <div className="glass-panel p-5 sm:p-6 rounded-3xl border border-slate-200/60 shadow-sm flex-grow flex flex-col justify-between">
             {error && (
               <div className="mb-4 bg-red-50 border border-red-200 text-red-600 p-4 rounded-2xl flex items-start space-x-3 text-sm font-semibold transition-all duration-300">
                 <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
@@ -381,7 +379,7 @@ export default function PassportPhoto() {
                 onDragOver={handleDrag}
                 onDragLeave={handleDrag}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-2xl p-16 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center space-y-4 group min-h-[350px] ${
+	                className={`border-2 border-dashed rounded-3xl p-8 sm:p-14 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center space-y-4 group min-h-[320px] ${
                   dragActive
                     ? 'border-indigo-600 bg-indigo-50/50 scale-[0.99]'
                     : 'border-slate-300 bg-white hover:bg-slate-50'
@@ -415,21 +413,24 @@ export default function PassportPhoto() {
               </label>
             ) : (
               <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    Biometric Crop Canvas
-                  </span>
-                  <button
-                    onClick={removeImage}
-                    className="text-xs text-red-500 hover:text-red-600 font-bold flex items-center space-x-1 cursor-pointer"
-                  >
+	                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+	                  <div>
+	                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+	                      Adjust Crop
+	                    </span>
+	                    <p className="text-sm text-slate-600 mt-1">Drag the photo into the frame and fine-tune it from the controls.</p>
+	                  </div>
+	                  <button
+	                    onClick={removeImage}
+	                    className="text-xs text-red-500 hover:text-red-600 font-bold flex items-center space-x-1 cursor-pointer self-start sm:self-auto"
+	                  >
                     <X className="h-4 w-4" />
                     <span>Remove Photo</span>
                   </button>
                 </div>
 
                 {/* Cropper Container */}
-                <div className="relative border border-slate-200 bg-slate-100 rounded-2xl overflow-hidden h-96 w-full">
+	                <div className="relative border border-slate-200 bg-slate-100 rounded-3xl overflow-hidden h-[360px] sm:h-[460px] w-full shadow-inner">
                   <Cropper
                     image={imageSrc}
                     crop={crop}
@@ -454,90 +455,175 @@ export default function PassportPhoto() {
         </div>
 
         {/* Right Column: Controls & Preview */}
-        <div className="lg:col-span-5 flex flex-col space-y-6">
-          
-          {/* Preset Sizing Panel */}
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-6">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-              <Maximize className="h-5 w-5 text-indigo-600" />
-              <span>Dimension Settings</span>
-            </h2>
-
-            {/* Presets List */}
-            <div className="grid grid-cols-2 gap-2">
-              {presets.map((preset) => (
-                <button
-                  key={preset.id}
-                  onClick={() => setSelectedPreset(preset.id)}
-                  className={`p-2.5 rounded-xl border text-left text-xs font-bold transition-all cursor-pointer shadow-sm ${
-                    selectedPreset === preset.id
-                      ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 shadow-md ring-2 ring-indigo-600/20'
-                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                  }`}
-                >
-                  <div className="font-extrabold">{preset.name}</div>
-                  {preset.id !== 'custom' && (
-                    <div className="text-[10px] font-medium text-slate-400 mt-0.5">
-                      {preset.widthMm} × {preset.heightMm} mm
-                    </div>
-                  )}
-                </button>
-              ))}
+        <div className="lg:col-span-5 flex flex-col space-y-5">
+          <div className="glass-panel p-5 rounded-3xl border border-slate-200/60 shadow-sm space-y-5">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+                <Maximize className="h-4 w-4 text-indigo-600" />
+                <span>Photo Setup</span>
+              </h2>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Step 1
+              </span>
             </div>
 
-            {/* Custom Dimensions */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Size</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-2">
+                {presets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    onClick={() => setSelectedPreset(preset.id)}
+                    className={`rounded-2xl border px-3 py-3 text-left text-xs font-bold transition-all cursor-pointer ${
+                      selectedPreset === preset.id
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-2 ring-indigo-600/15'
+                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
+                    }`}
+                  >
+                    <span className="block leading-snug">{preset.label || 'Custom'}</span>
+                    {preset.id !== 'custom' && (
+                      <span className="mt-1 block text-[10px] font-semibold text-slate-400">
+                        {preset.helper}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {selectedPreset === 'custom' && (
-              <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200/80 shadow-inner">
+              <div className="grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 p-3 border border-slate-200/70">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Width (mm):</label>
+                  <label className="text-[11px] font-bold text-slate-500">Width mm</label>
                   <input
                     type="number"
                     min="10"
                     max="150"
                     value={customWidth}
                     onChange={(e) => setCustomWidth(Math.max(10, parseFloat(e.target.value) || 10))}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-sm text-slate-800 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-bold text-sm text-slate-800 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Height (mm):</label>
+                  <label className="text-[11px] font-bold text-slate-500">Height mm</label>
                   <input
                     type="number"
                     min="10"
                     max="150"
                     value={customHeight}
                     onChange={(e) => setCustomHeight(Math.max(10, parseFloat(e.target.value) || 10))}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-sm text-slate-800 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-bold text-sm text-slate-800 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
             )}
 
-            {/* Selection info readout */}
-            <div className="p-3.5 bg-indigo-50 border border-indigo-100/50 rounded-2xl text-[11px] font-semibold text-indigo-950 leading-normal">
-              Selected Target Size:{' '}
-              <strong className="text-indigo-600 font-extrabold">{currentWidthMm} × {currentHeightMm} mm</strong>{' '}
-              (approx.{' '}
-              <strong className="text-indigo-600 font-extrabold">
-                {Math.round(currentWidthMm * 11.81)} × {Math.round(currentHeightMm * 11.81)} px
-              </strong>{' '}
-              at print quality 300 DPI)
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <Palette className="h-4 w-4 text-indigo-600" />
+                Background
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {bgColors.map((color) => (
+                  <button
+                    key={color.name}
+                    onClick={() => setBgColor(color.value)}
+                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold transition-all cursor-pointer ${
+                      bgColor === color.value
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-2 ring-indigo-600/15'
+                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
+                    }`}
+                  >
+                    <span className={`h-4 w-4 rounded-full border shadow-inner ${color.class}`}></span>
+                    {color.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-indigo-50/70 border border-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-950">
+              Output: <strong className="text-indigo-700">{currentWidthMm} x {currentHeightMm} mm</strong>
+              <span className="text-indigo-700/70"> at 300 DPI</span>
+            </div>
+
+            <div className="border-t border-slate-200/70 pt-3">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((value) => !value)}
+                className="w-full flex items-center justify-between rounded-2xl px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 transition"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-indigo-600" />
+                  Advanced Options
+                </span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {advancedOpen && (
+                <div className="mt-3 space-y-3 rounded-2xl bg-slate-50 p-3 border border-slate-200/70">
+                  <p className="text-xs font-semibold text-slate-500">Target file size</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { label: '20 KB', value: '20' },
+                      { label: '50 KB', value: '50' },
+                      { label: '100 KB', value: '100' },
+                      { label: 'Custom', value: 'custom' }
+                    ].map((item) => (
+                      <button
+                        key={item.value}
+                        onClick={() => setCompressPreset(item.value)}
+                        className={`py-2 px-2 rounded-xl border text-[11px] font-bold transition-all cursor-pointer text-center ${
+                          compressPreset === item.value
+                            ? 'border-indigo-600 bg-white text-indigo-700 ring-2 ring-indigo-600/15'
+                            : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {compressPreset === 'custom' && (
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-bold text-slate-500">Max</label>
+                      <input
+                        type="number"
+                        min="5"
+                        max="500"
+                        value={customCompressKb}
+                        onChange={(e) => setCustomCompressKb(Math.max(5, parseInt(e.target.value) || 5))}
+                        className="w-24 bg-white border border-slate-300 rounded-xl px-3 py-2 text-right text-indigo-600 font-extrabold text-sm focus:outline-none focus:border-indigo-500"
+                      />
+                      <span className="text-xs text-slate-400 font-bold">KB</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Sizing & Alignment Panel */}
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-6">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-              <Sliders className="h-5 w-5 text-indigo-600" />
-              <span>Alignment Settings</span>
-            </h2>
+          <div className="glass-panel p-5 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+                <Sliders className="h-4 w-4 text-indigo-600" />
+                <span>Adjust Crop</span>
+              </h2>
+              {imageSrc && (
+                <button
+                  onClick={resetCropper}
+                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  Reset
+                </button>
+              )}
+            </div>
 
             {imageSrc ? (
-              <div className="space-y-6">
-                {/* Zoom Control */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-slate-700 font-bold">
-                    <span>Scale Zoom</span>
+                    <span>Zoom</span>
                     <span>{Math.round(zoom * 100)}%</span>
                   </div>
                   <input
@@ -551,11 +637,10 @@ export default function PassportPhoto() {
                   />
                 </div>
 
-                {/* Rotation Control */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-slate-700 font-bold">
-                    <span>Align Angle</span>
-                    <span>{rotation}°</span>
+                    <span>Rotation</span>
+                    <span>{rotation} deg</span>
                   </div>
                   <input
                     type="range"
@@ -567,194 +652,15 @@ export default function PassportPhoto() {
                     className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                   />
                 </div>
-
-                {/* Reset Button */}
-                <button
-                  onClick={resetCropper}
-                  className="w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold text-xs transition-colors duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  <span>Reset Alignment</span>
-                </button>
               </div>
             ) : (
-              <div className="text-center p-6 text-slate-400 font-medium text-xs">
-                Upload a portrait image to configure options.
-              </div>
+              <p className="text-sm text-slate-400 font-medium">Upload a portrait image to adjust crop and alignment.</p>
             )}
           </div>
 
-          {/* Background Customization Panel */}
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-6">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-              <Palette className="h-5 w-5 text-indigo-600" />
-              <span>Background Color</span>
-            </h2>
-
-            {imageSrc ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {bgColors.map((color) => (
-                    <button
-                      key={color.name}
-                      onClick={() => setBgColor(color.value)}
-                      className={`flex flex-col items-center p-3 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-sm ${
-                        bgColor === color.value
-                          ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 shadow-md ring-2 ring-indigo-600/20'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                      }`}
-                    >
-                      <div className={`w-8 h-8 rounded-full border mb-2 shadow-inner ${color.class}`}></div>
-                      <span>{color.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center p-6 text-slate-400 font-medium text-xs">
-                Upload a portrait image to edit background options.
-              </div>
-            )}
-          </div>
-
-          {/* Target Compression Panel */}
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-6">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-              <Zap className="h-5 w-5 text-indigo-600" />
-              <span>Target File Size</span>
-            </h2>
-
-            {imageSrc ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {[
-                    { label: '20 KB', value: '20' },
-                    { label: '50 KB', value: '50' },
-                    { label: '100 KB', value: '100' },
-                    { label: 'Custom', value: 'custom' }
-                  ].map((item) => (
-                    <button
-                      key={item.value}
-                      onClick={() => setCompressPreset(item.value)}
-                      className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-sm text-center ${
-                        compressPreset === item.value
-                          ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 shadow-md ring-2 ring-indigo-600/20'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-
-                {compressPreset === 'custom' && (
-                  <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-xl border border-slate-200/80 shadow-inner">
-                    <label className="text-xs font-bold text-slate-500">Max KB Limit:</label>
-                    <input
-                      type="number"
-                      min="5"
-                      max="500"
-                      value={customCompressKb}
-                      onChange={(e) => setCustomCompressKb(Math.max(5, parseInt(e.target.value) || 5))}
-                      className="w-20 bg-white border border-slate-300 rounded-lg px-2 py-1 text-right text-indigo-600 font-extrabold text-sm focus:outline-none focus:border-indigo-500"
-                    />
-                    <span className="text-xs text-slate-400 font-bold">KB</span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center p-6 text-slate-400 font-medium text-xs">
-                Upload a portrait image to configure target size.
-              </div>
-            )}
-          </div>
-
-          {/* Printable Sheet Panel */}
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-6">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-              <Printer className="h-5 w-5 text-indigo-600" />
-              <span>Printable Photo Sheet (A4)</span>
-            </h2>
-
-            {compressedResult ? (
-              <div className="space-y-4">
-                {/* Photo Grid Layout Counter Options */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-700">Select Layout Count:</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[4, 6, 8].map((count) => (
-                      <button
-                        key={count}
-                        onClick={() => setSheetPhotosCount(count)}
-                        className={`py-2 px-3 rounded-xl border text-xs font-extrabold transition-all cursor-pointer shadow-sm text-center ${
-                          sheetPhotosCount === count
-                            ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 shadow-md ring-2 ring-indigo-600/20'
-                            : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                        }`}
-                      >
-                        {count} Photos
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* mini A4 preview area */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sheet Layout Preview:</label>
-                  <div className="flex items-center justify-center p-4 bg-slate-100/50 rounded-2xl border border-slate-200 relative min-h-[220px]">
-                    {sheetPreviewUrl ? (
-                      <div className="relative border border-slate-300 shadow-lg bg-white w-36 aspect-[210/297] overflow-hidden">
-                        <img
-                          src={sheetPreviewUrl}
-                          alt="Print A4 Layout Preview"
-                          className="w-full h-full object-contain"
-                        />
-                        {generatingSheet && (
-                          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                            <RefreshCw className="h-5 w-5 text-indigo-600 animate-spin" />
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-slate-400 text-xs">Generating preview...</div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Export Buttons */}
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <a
-                    href={sheetPngUrl || '#'}
-                    download={`passport_sheet_${sheetPhotosCount}_photos.png`}
-                    className={`py-2.5 px-4 rounded-xl border border-slate-200 hover:border-indigo-200 bg-white hover:bg-indigo-50/20 text-slate-700 hover:text-indigo-600 font-bold text-xs transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer ${!sheetPngUrl ? 'opacity-55 pointer-events-none' : ''}`}
-                  >
-                    <FileImage className="h-4 w-4 text-indigo-500" />
-                    <span>Export PNG</span>
-                  </a>
-
-                  <button
-                    onClick={downloadSheetPdf}
-                    disabled={!sheetPreviewUrl}
-                    className="py-2.5 px-4 rounded-xl border border-slate-200 hover:border-emerald-200 bg-white hover:bg-emerald-50/20 text-slate-700 hover:text-emerald-600 font-bold text-xs transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer disabled:opacity-50"
-                  >
-                    <FileText className="h-4 w-4 text-emerald-500" />
-                    <span>Export PDF</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center p-6 text-slate-400 font-medium text-xs">
-                Upload a portrait image to configure printable sheets.
-              </div>
-            )}
-          </div>
-
-          {/* Live Preview Panel */}
-          <div className="glass-panel p-6 rounded-3xl border border-slate-200/60 shadow-sm flex-grow flex flex-col justify-between space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Biometric Live Preview
-              </h2>
+          <div className="glass-panel p-5 rounded-3xl border border-slate-200/60 shadow-sm space-y-5">
+            <div className="flex justify-between items-center gap-3">
+              <h2 className="text-base font-bold text-slate-900">Preview & Download</h2>
               {compressedResult && (
                 <div className="text-[10px] font-bold text-slate-500">
                   Target: {targetCompressKb} KB
@@ -762,14 +668,14 @@ export default function PassportPhoto() {
               )}
             </div>
 
-            <div className="flex-grow flex items-center justify-center">
+            <div className="flex items-center justify-center rounded-3xl bg-slate-50 border border-slate-200/70 min-h-[180px] p-5">
               {compressedResult ? (
                 <div className="relative flex flex-col items-center">
-                  <div 
-                    className="relative border-2 border-dashed border-indigo-500/50 shadow-md overflow-hidden bg-white flex items-center justify-center"
+                  <div
+                    className="relative overflow-hidden bg-white flex items-center justify-center shadow-sm ring-1 ring-slate-200"
                     style={{
-                      width: aspect >= 1 ? '160px' : `${160 * aspect}px`,
-                      height: aspect <= 1 ? '208px' : `${208 / aspect}px`
+                      width: aspect >= 1 ? '140px' : `${140 * aspect}px`,
+                      height: aspect <= 1 ? '182px' : `${182 / aspect}px`
                     }}
                   >
                     <img
@@ -779,52 +685,119 @@ export default function PassportPhoto() {
                     />
                     {generatingPreview && (
                       <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-                        <RefreshCw className="h-6 w-6 text-indigo-600 animate-spin" />
+                        <RefreshCw className="h-5 w-5 text-indigo-600 animate-spin" />
                       </div>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="text-center space-y-2 p-6">
-                  <div className="bg-slate-100 p-4 rounded-full text-slate-400 border border-slate-200/80 shadow-sm inline-block">
-                    <ImageIcon className="h-6 w-6" />
+                <div className="text-center space-y-2">
+                  <div className="bg-white p-3 rounded-full text-slate-400 border border-slate-200/80 shadow-sm inline-block">
+                    <ImageIcon className="h-5 w-5" />
                   </div>
-                  <p className="text-slate-800 text-xs font-bold">Preview Standby</p>
-                  <p className="text-slate-500 text-[10px] max-w-xs font-semibold">
-                    Once loaded, your aligned document outputs render here.
-                  </p>
+                  <p className="text-slate-700 text-xs font-bold">Preview appears after upload</p>
                 </div>
               )}
             </div>
 
             {compressedResult && (
-              <div className="space-y-4">
-                {/* Stats Readout */}
-                <div className="grid grid-cols-2 gap-4 p-3 bg-slate-50 border border-slate-200 rounded-xl text-center text-xs">
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 border border-slate-200 p-3 text-center text-xs">
                   <div>
-                    <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Before Compress</div>
+                    <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Original Crop</div>
                     <div className="font-bold text-slate-700">{croppedSizeKb} KB</div>
                   </div>
                   <div>
-                    <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Optimized Output</div>
+                    <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Download Size</div>
                     <div className="font-extrabold text-emerald-600">{compressedResult.sizeKb} KB</div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2 text-indigo-600 font-bold text-xs bg-indigo-50 px-3 py-2 rounded-xl border border-indigo-100/50">
+                <div className="flex items-center space-x-2 text-indigo-600 font-bold text-xs bg-indigo-50 px-3 py-2 rounded-2xl border border-indigo-100/50">
                   <CheckCircle className="h-4 w-4 font-bold" />
-                  <span>Size and biometric crops compliant</span>
+                  <span>Ready for download</span>
                 </div>
 
                 <a
                   href={compressedResult.url}
                   download={`passport_${currentWidthMm}x${currentHeightMm}mm_max_${targetCompressKb}kb.jpg`}
-                  className="w-full py-3 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-colors duration-200 flex items-center justify-center space-x-2 shadow-md shadow-emerald-600/10 cursor-pointer animate-pulse-slow text-center"
+                  className="w-full py-3 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-colors duration-200 flex items-center justify-center space-x-2 shadow-md shadow-emerald-600/10 cursor-pointer text-center"
                 >
                   <Download className="h-4 w-4" />
-                  <span>Download Cropped Photo</span>
+                  <span>Download Photo</span>
                 </a>
               </div>
+            )}
+          </div>
+
+          <div className="glass-panel p-5 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
+            <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <Printer className="h-4 w-4 text-indigo-600" />
+              <span>Printable Sheet</span>
+            </h2>
+
+            {compressedResult ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-2">
+                  {[4, 6, 8].map((count) => (
+                    <button
+                      key={count}
+                      onClick={() => setSheetPhotosCount(count)}
+                      className={`py-2 px-3 rounded-xl border text-xs font-extrabold transition-all cursor-pointer text-center ${
+                        sheetPhotosCount === count
+                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-2 ring-indigo-600/15'
+                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
+                      }`}
+                    >
+                      {count}
+                      <span className="ml-1 font-semibold">photos</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-center rounded-3xl bg-slate-50 border border-slate-200/70 p-4 min-h-[170px]">
+                  {sheetPreviewUrl ? (
+                    <div className="relative border border-slate-200 shadow-sm bg-white w-28 aspect-[210/297] overflow-hidden">
+                      <img
+                        src={sheetPreviewUrl}
+                        alt="Print A4 Layout Preview"
+                        className="w-full h-full object-contain"
+                      />
+                      {generatingSheet && (
+                        <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                          <RefreshCw className="h-5 w-5 text-indigo-600 animate-spin" />
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-slate-400 text-xs">Generating preview...</div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <a
+                    href={sheetPngUrl || '#'}
+                    download={`passport_sheet_${sheetPhotosCount}_photos.png`}
+                    className={`py-2.5 px-4 rounded-xl border border-slate-200 hover:border-indigo-200 bg-white hover:bg-indigo-50/20 text-slate-700 hover:text-indigo-600 font-bold text-xs transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer ${!sheetPngUrl ? 'opacity-55 pointer-events-none' : ''}`}
+                  >
+                    <FileImage className="h-4 w-4 text-indigo-500" />
+                    <span>PNG</span>
+                  </a>
+
+                  <button
+                    onClick={downloadSheetPdf}
+                    disabled={!sheetPreviewUrl}
+                    className="py-2.5 px-4 rounded-xl border border-slate-200 hover:border-emerald-200 bg-white hover:bg-emerald-50/20 text-slate-700 hover:text-emerald-600 font-bold text-xs transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer disabled:opacity-50"
+                  >
+                    <FileText className="h-4 w-4 text-emerald-500" />
+                    <span>PDF</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 font-medium">
+                Create a cropped photo first, then export a print-ready A4 sheet.
+              </p>
             )}
           </div>
         </div>
@@ -844,7 +817,7 @@ export default function PassportPhoto() {
           <ul className="space-y-3 text-sm text-slate-600">
             <li className="list-disc list-inside">Exact biometric presets for passport, visa, and ID photos.</li>
             <li className="list-disc list-inside">Drag-to-align image cropping with head and chin guide overlays.</li>
-            <li className="list-disc list-inside">Background color control with white, blue, red, and grayscale options.</li>
+	            <li className="list-disc list-inside">Background color control with simple white and blue options.</li>
             <li className="list-disc list-inside">Download splits, printable A4 sheets, and secure local-only export.</li>
           </ul>
         </section>
