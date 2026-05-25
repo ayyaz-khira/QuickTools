@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
 import { Upload, X, Sliders, RefreshCw, Download, Image as ImageIcon, CheckCircle, AlertCircle, Palette, Maximize, Zap, Printer, FileText, FileImage, ChevronDown } from 'lucide-react';
 import { jsPDF } from 'jspdf';
@@ -348,16 +349,17 @@ export default function PassportPhoto() {
     <>
       <SEO
         title="Passport Size Photo Maker Online Free | QuickTools"
-        description="Create exact passport and visa photos in your browser with local-first processing, biometric alignment guides, and printable sheet export. No uploads required."
+        description="Use QuickTools passport size photo maker online free to crop, resize, and export printable passport photos directly in your browser. Private, fast, and no uploads required."
+        pageName="Passport Size Photo Maker"
       />
       <div className="max-w-5xl mx-auto space-y-8 py-4">
         {/* Page Header */}
-	      <div className="space-y-3">
-	        <h1 className="text-3xl font-extrabold text-slate-900">Passport Size Photo Maker</h1>
-	        <p className="text-slate-600 text-sm leading-relaxed">
-	          Upload a portrait, align the crop, choose a background, and download a passport-ready photo or printable sheet. Everything runs privately in your browser.
-	        </p>
-	      </div>
+		      <div className="space-y-3">
+		        <h1 className="text-3xl font-extrabold text-slate-900">Passport Size Photo Maker</h1>
+		        <p className="text-slate-600 text-sm leading-relaxed">
+		          QuickTools passport size photo maker helps you create passport photos online for free. Upload a portrait, adjust the crop, choose a white or blue background, and export a printable photo sheet directly in your browser with no uploads.
+		        </p>
+		      </div>
 
       {/* Main Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -804,52 +806,76 @@ export default function PassportPhoto() {
 
       </div>
 
-      <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">
-        <div>
-          <h2 id="passport-overview" className="text-2xl font-bold text-slate-900">Passport Photo Tool Overview</h2>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            QuickTools Passport Photo Maker runs entirely in your browser. That means your identity image never leaves your device, and you get fast output without server uploads or storage.
-          </p>
-        </div>
+	      <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">
+	        <div>
+	          <h2 id="passport-overview" className="text-2xl font-bold text-slate-900">Online Passport Size Photo Maker</h2>
+	          <p className="text-sm text-slate-600 leading-relaxed">
+	            Create passport size photos for applications, forms, and printouts without installing software. QuickTools keeps the workflow simple: crop the face, choose the background, preview the result, then download a single photo or an A4 sheet.
+	          </p>
+	        </div>
 
-        <section aria-labelledby="passport-features" className="space-y-4">
-          <h3 id="passport-features" className="text-xl font-semibold text-slate-900">Features</h3>
-          <ul className="space-y-3 text-sm text-slate-600">
-            <li className="list-disc list-inside">Exact biometric presets for passport, visa, and ID photos.</li>
-            <li className="list-disc list-inside">Drag-to-align image cropping with head and chin guide overlays.</li>
-	            <li className="list-disc list-inside">Background color control with simple white and blue options.</li>
-            <li className="list-disc list-inside">Download splits, printable A4 sheets, and secure local-only export.</li>
-          </ul>
-        </section>
+	        <section aria-labelledby="passport-usage" className="space-y-4">
+	          <h3 id="passport-usage" className="text-xl font-semibold text-slate-900">How to Use</h3>
+	          <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600">
+	            <li>Upload a clear portrait photo in JPG, PNG, or WEBP format.</li>
+	            <li>Adjust the crop, zoom, and rotation until the face fits the frame.</li>
+	            <li>Choose a white or blue background.</li>
+	            <li>Select a printable layout with 4, 6, or 8 photos.</li>
+	            <li>Export the final passport photo as PNG or PDF.</li>
+	          </ol>
+	        </section>
 
-        <section aria-labelledby="passport-usage" className="space-y-4">
-          <h3 id="passport-usage" className="text-xl font-semibold text-slate-900">How to Use</h3>
-          <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600">
-            <li>Upload a clear portrait photo in JPG, PNG, or WEBP format.</li>
-            <li>Choose a passport or visa size preset, or enter custom millimeter dimensions.</li>
-            <li>Adjust crop, zoom, rotation, and background color until the face fits the frame.</li>
-            <li>Export the corrected photo or generate a printable photo sheet without leaving your browser.</li>
-          </ol>
-        </section>
+	        <section aria-labelledby="passport-features" className="space-y-4">
+	          <h3 id="passport-features" className="text-xl font-semibold text-slate-900">Features</h3>
+	          <ul className="space-y-3 text-sm text-slate-600">
+	            <li className="list-disc list-inside">Printable A4 passport photo sheets for home or shop printing.</li>
+	            <li className="list-disc list-inside">White and blue background options for common passport and visa requirements.</li>
+	            <li className="list-disc list-inside">PNG and PDF export for single photos and print layouts.</li>
+	            <li className="list-disc list-inside">Browser-based processing with no server uploads.</li>
+	            <li className="list-disc list-inside">Privacy-friendly workflow for personal identity photos.</li>
+	          </ul>
+	        </section>
 
-        <section aria-labelledby="passport-faq" className="space-y-4">
-          <h3 id="passport-faq" className="text-xl font-semibold text-slate-900">FAQ</h3>
-          <div className="space-y-4 text-sm text-slate-600">
-            <div>
-              <p className="font-semibold text-slate-900">Does this tool upload my photo?</p>
-              <p>No. All photo formatting and export happen locally in your browser, so your passport photo never leaves your computer.</p>
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900">Which file types are supported?</p>
-              <p>QuickTools accepts JPG, JPEG, PNG, and WEBP image files for passport photo creation.</p>
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900">Can I print the result?</p>
-              <p>Yes. Use the printable sheet export to generate A4-ready passport photo layouts for printing.</p>
-            </div>
-          </div>
-        </section>
-      </section>
+	        <section aria-labelledby="passport-faq" className="space-y-4">
+	          <h3 id="passport-faq" className="text-xl font-semibold text-slate-900">FAQ</h3>
+	          <div className="space-y-4 text-sm text-slate-600">
+	            <div>
+	              <p className="font-semibold text-slate-900">Can I create passport size photos online for free?</p>
+	              <p>Yes. QuickTools lets you create passport size photos online for free, including crop adjustment, background selection, and printable sheet export.</p>
+	            </div>
+	            <div>
+	              <p className="font-semibold text-slate-900">Does QuickTools upload my images?</p>
+	              <p>No. Your photo is processed locally in your browser, so it never needs to be uploaded to a server.</p>
+	            </div>
+	            <div>
+	              <p className="font-semibold text-slate-900">What background color should I use?</p>
+	              <p>White is the safest default for most passport and ID photos. Blue is available for requirements that specifically ask for a blue background.</p>
+	            </div>
+	            <div>
+	              <p className="font-semibold text-slate-900">Can I print multiple passport photos on one sheet?</p>
+	              <p>Yes. Use the printable sheet option to arrange multiple passport photos on an A4 layout and export it as PNG or PDF.</p>
+	            </div>
+	          </div>
+	        </section>
+
+	        <section aria-labelledby="passport-related" className="space-y-4">
+	          <h3 id="passport-related" className="text-xl font-semibold text-slate-900">Related Tools</h3>
+	          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm font-semibold">
+	            <Link to="/resize-image" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-indigo-600 hover:bg-slate-50 transition">
+	              Resize Image
+	            </Link>
+	            <Link to="/compress-image" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-indigo-600 hover:bg-slate-50 transition">
+	              Compress Image
+	            </Link>
+	            <Link to="/signature-cropper" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-indigo-600 hover:bg-slate-50 transition">
+	              Signature Cropper
+	            </Link>
+	            <Link to="/image-to-pdf" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-indigo-600 hover:bg-slate-50 transition">
+	              Image to PDF
+	            </Link>
+	          </div>
+	        </section>
+	      </section>
       </div>
     </>
   );
