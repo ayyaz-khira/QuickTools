@@ -76,8 +76,8 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="QuickTools - Resize Image, Passport Photo & Signature Crop Tool"
-        description="QuickTools provides local-first, privacy-first image utilities for passport photos, file-size resizing, and signature cropping with zero uploads."
+        title="QuickTools - Free Image & PDF Tools Online"
+        description="QuickTools provides free local-first image and PDF tools for resizing, compression, passport photos, signatures, image to PDF, and page numbering with zero uploads."
       />
       <div className="space-y-16 py-8">
         {/* Hero Section */}
@@ -87,12 +87,12 @@ export default function Home() {
         <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-none text-slate-900">
           Fast, Secure, Local-First {' '}
           <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Image Utilities
+            Image & PDF Tools
           </span>
         </h1>
         
         <p className="text-lg text-slate-600 leading-relaxed font-medium">
-Resize images, create passport photos, and crop signatures instantly in your browser — with zero uploads and complete privacy.         </p>
+Resize images, create passport photos, convert images to PDF, add page numbers, and crop signatures instantly in your browser — with zero uploads and complete privacy.         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs font-bold text-slate-500">
           <div className="flex items-center space-x-1.5">
@@ -107,7 +107,7 @@ Resize images, create passport photos, and crop signatures instantly in your bro
           <span className="text-slate-300">•</span>
           <div className="flex items-center space-x-1.5">
             <Heart className="h-4 w-4 text-pink-500" />
-            <span>Ad-free & Open Source</span>
+            <span>Free Browser Tools</span>
           </div>
         </div>
       </div>

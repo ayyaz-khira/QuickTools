@@ -27,6 +27,7 @@ export default function Navbar() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (window.innerWidth < 768) return;
       if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target)) {
         setIsToolsOpen(false);
       }
@@ -118,7 +119,13 @@ export default function Navbar() {
 
           <div className="md:hidden">
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => {
+                setIsOpen((value) => {
+                  const nextValue = !value;
+                  if (!nextValue) setIsToolsOpen(false);
+                  return nextValue;
+                });
+              }}
               className="inline-flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 focus:outline-none transition-colors duration-200"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -157,8 +164,10 @@ export default function Navbar() {
           {/* Tools Dropdown for Mobile */}
           <div className="space-y-1">
             <button
-              onClick={() => setIsToolsOpen(!isToolsOpen)}
-	              className="w-full flex items-center px-4 py-3 rounded-xl text-lg font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all duration-200"
+              onClick={() => setIsToolsOpen((value) => !value)}
+		              className="w-full flex items-center px-4 py-3 rounded-xl text-lg font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all duration-200"
+              aria-expanded={isToolsOpen}
+              aria-controls="mobile-tools-menu"
             >
               <Settings className="h-5 w-5 mr-3" />
               All Tools
@@ -166,7 +175,7 @@ export default function Navbar() {
             </button>
 
             {isToolsOpen && (
-              <div className="space-y-1 pl-4">
+              <div id="mobile-tools-menu" className="space-y-1 pl-4">
                 {navigation.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.href;
