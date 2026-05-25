@@ -1,8 +1,23 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Camera, Image as ImageIcon, CheckSquare, Zap as ZapIcon, ArrowRight, ShieldCheck, Zap, Heart, Files, FileText } from 'lucide-react';
 import SEO from '../components/SEO';
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  const openTool = (event, href) => {
+    if (event.target.closest('a, button')) return;
+    navigate(href);
+  };
+
+  const handleToolKeyDown = (event, href) => {
+    if (event.target.closest('a, button')) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      navigate(href);
+    }
+  };
+
   const tools = [
     {
       name: 'Passport Size Photo Maker',
@@ -28,7 +43,7 @@ export default function Home() {
       href: '/compress-image',
       icon: ZapIcon,
       color: 'from-emerald-500 to-teal-500',
-      tag: 'Fast',
+      tag: 'Lightning Fast',
       features: ['Quality slider control', 'Real-time file size preview', 'Instant browser processing', 'No server uploads']
     },
     {      name: 'Image to PDF',
@@ -53,7 +68,7 @@ export default function Home() {
       href: '/signature-cropper',
       icon: CheckSquare,
       color: 'from-purple-500 to-pink-500',
-      tag: 'New',
+      tag: 'Trending',
       features: ['Interactive signature cropping', 'High contrast & threshold adjustment', 'Binarization (clean white bg)', 'Download as transparent PNG']
     },
   ];
@@ -102,10 +117,14 @@ Resize images, create passport photos, and crop signatures instantly in your bro
         {tools.map((tool) => {
           const Icon = tool.icon;
           return (
-            <div
-              key={tool.name}
-              className="glass-card rounded-3xl p-6 flex flex-col justify-between relative group overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-            >
+	            <div
+	              key={tool.name}
+	              role="link"
+	              tabIndex={0}
+	              onClick={(event) => openTool(event, tool.href)}
+	              onKeyDown={(event) => handleToolKeyDown(event, tool.href)}
+	              className="glass-card rounded-3xl p-6 flex flex-col justify-between relative group overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+	            >
               {/* Card top gradient line decoration */}
               <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent group-hover:via-indigo-500 transition-all duration-500"></div>
               
