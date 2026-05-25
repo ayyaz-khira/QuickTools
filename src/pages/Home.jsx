@@ -152,6 +152,38 @@ Resize images, create passport photos, and crop signatures instantly in your bro
                     </div>
                   </div>
                 ) : null}
+
+                {tool.name === 'Image to PDF' ? (
+                  <div className="space-y-3 mb-6">
+                    <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold">PDF Quick Access</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        to="/jpg-to-pdf"
+                        className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-2xl py-2 text-center hover:bg-slate-200 transition"
+                      >
+                        JPG to PDF
+                      </Link>
+                      <Link
+                        to="/png-to-pdf"
+                        className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-2xl py-2 text-center hover:bg-slate-200 transition"
+                      >
+                        PNG to PDF
+                      </Link>
+                      <Link
+                        to="/images-to-pdf"
+                        className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-2xl py-2 text-center hover:bg-slate-200 transition"
+                      >
+                        Images to PDF
+                      </Link>
+                      <Link
+                        to="/photo-to-pdf"
+                        className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-2xl py-2 text-center hover:bg-slate-200 transition"
+                      >
+                        Photo to PDF
+                      </Link>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               <Link

@@ -20,6 +20,10 @@ function App() {
           <Route path="/resize-image" element={<ResizeImage />} />
           <Route path="/compress-image" element={<CompressImage />} />
           <Route path="/image-to-pdf" element={<ImageToPDF />} />
+          <Route path="/jpg-to-pdf" element={<ImageToPDF variant="jpg" />} />
+          <Route path="/png-to-pdf" element={<ImageToPDF variant="png" />} />
+          <Route path="/images-to-pdf" element={<ImageToPDF variant="images" />} />
+          <Route path="/photo-to-pdf" element={<ImageToPDF variant="photo" />} />
           <Route path="/resize-image-to-20kb" element={<ResizeImageSeo targetKb={20} />} />
           <Route path="/resize-image-to-50kb" element={<ResizeImageSeo targetKb={50} />} />
           <Route path="/resize-image-to-100kb" element={<ResizeImageSeo targetKb={100} />} />

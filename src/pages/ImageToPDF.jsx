@@ -1,10 +1,154 @@
 import { useState, useRef, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
-import { Files, Upload, Download, Image as ImageIcon, Trash2, FileText, Zap } from 'lucide-react';
+import { Files, Upload, Download, Trash2, FileText } from 'lucide-react';
 import SEO from '../components/SEO';
 import { isSupportedImageFile } from '../utils/fileValidation';
 
-export default function ImageToPDF() {
+const pageConfigs = {
+  default: {
+    title: 'Image to PDF Converter | QuickTools',
+    description: 'Convert JPG, PNG, and WEBP images into a printable PDF document instantly in your browser. No uploads or backend required.',
+    pageName: 'Image to PDF Converter',
+    heading: 'Image to PDF Converter',
+    intro: 'Convert JPG, PNG, or WEBP images into a printable PDF document in your browser. No uploads, no backend, and no data leaves your device.',
+    uploadLabel: 'Upload images',
+    uploadHelp: 'Select one or more image files to combine into a PDF. Each image becomes one PDF page.',
+    whyHeading: 'Why use Image to PDF?',
+    benefits: [
+      'Create a PDF from one or multiple images instantly without uploading files.',
+      'Each photo becomes its own page for easy printing and sharing.',
+      'All conversion is performed locally in the browser for full privacy.',
+      'Supports JPG, JPEG, PNG, and WEBP images.'
+    ],
+    howToHeading: 'How to Convert Images to PDF',
+    steps: [
+      'Upload one or more JPG, PNG, or WEBP images.',
+      'Review the selected images and remove anything you do not need.',
+      'Click Convert to PDF to create one printable PDF document.',
+      'Download the generated PDF directly to your device.'
+    ],
+    faqs: [
+      ['Are my images uploaded?', 'No. The PDF is created locally in your browser, so your images never leave your device.'],
+      ['Can I convert multiple images at once?', 'Yes. Add multiple images and QuickTools will place each image on its own PDF page.'],
+      ['Which image formats are supported?', 'QuickTools supports JPG, JPEG, PNG, and WEBP images for PDF conversion.']
+    ]
+  },
+  jpg: {
+    title: 'JPG to PDF Converter Online Free | QuickTools',
+    description: 'Convert JPG images to PDF online for free in your browser. Fast, private JPG to PDF conversion with no uploads or account required.',
+    pageName: 'JPG to PDF Converter',
+    heading: 'JPG to PDF Converter',
+    intro: 'Convert JPG and JPEG photos into a clean PDF document instantly. The conversion runs locally in your browser, so your files stay private.',
+    uploadLabel: 'Upload JPG images',
+    uploadHelp: 'Select one or more JPG/JPEG files to turn them into a PDF. Each JPG becomes one PDF page.',
+    whyHeading: 'Why convert JPG to PDF?',
+    benefits: [
+      'Turn JPG photos, scans, and documents into a single PDF for easy sharing.',
+      'Keep original image privacy with browser-only processing.',
+      'Create print-friendly A4 PDF pages from JPG or JPEG files.',
+      'Combine multiple JPG images into one PDF without installing software.'
+    ],
+    howToHeading: 'How to Convert JPG to PDF',
+    steps: [
+      'Upload your JPG or JPEG image files.',
+      'Check the image order and remove any file you do not want in the PDF.',
+      'Click Convert to PDF to generate the document in your browser.',
+      'Download the finished PDF file.'
+    ],
+    faqs: [
+      ['Can I convert JPEG files too?', 'Yes. JPG and JPEG files are both supported.'],
+      ['Will the JPG quality be preserved?', 'QuickTools uses high-quality image export while fitting each image onto a PDF page.'],
+      ['Can I combine several JPGs into one PDF?', 'Yes. Select multiple JPG images and each one will be added as a separate page.']
+    ]
+  },
+  png: {
+    title: 'PNG to PDF Converter Online Free | QuickTools',
+    description: 'Convert PNG images to PDF online for free with private browser-based processing. No uploads, signups, or backend storage.',
+    pageName: 'PNG to PDF Converter',
+    heading: 'PNG to PDF Converter',
+    intro: 'Convert PNG images, screenshots, and transparent graphics into a printable PDF in your browser. No upload or server processing is required.',
+    uploadLabel: 'Upload PNG images',
+    uploadHelp: 'Select one or more PNG files to place into a PDF. Transparent areas are rendered on a white page background.',
+    whyHeading: 'Why convert PNG to PDF?',
+    benefits: [
+      'Make screenshots and PNG images easier to print, submit, or share.',
+      'Convert transparent PNGs onto a clean white PDF page.',
+      'Combine multiple PNG files into a single PDF document.',
+      'Keep sensitive screenshots private with local browser conversion.'
+    ],
+    howToHeading: 'How to Convert PNG to PDF',
+    steps: [
+      'Upload your PNG image files.',
+      'Review the selected PNG previews.',
+      'Click Convert to PDF to create the document locally.',
+      'Download the generated PDF.'
+    ],
+    faqs: [
+      ['What happens to transparent PNG backgrounds?', 'Transparent areas are placed on a white PDF page for predictable printing.'],
+      ['Can I upload screenshots?', 'Yes. PNG screenshots work well for PDF conversion.'],
+      ['Are PNG files sent to a server?', 'No. The conversion happens inside your browser only.']
+    ]
+  },
+  images: {
+    title: 'Images to PDF Converter Online Free | QuickTools',
+    description: 'Convert multiple images to one PDF online for free. Combine JPG, PNG, and WEBP images privately in your browser with no uploads.',
+    pageName: 'Images to PDF Converter',
+    heading: 'Images to PDF Converter',
+    intro: 'Combine multiple JPG, PNG, and WEBP images into one PDF document. Each image becomes its own page, ready for download and printing.',
+    uploadLabel: 'Upload multiple images',
+    uploadHelp: 'Select all images you want to combine. QuickTools will create a multi-page PDF from your selected files.',
+    whyHeading: 'Why convert images to one PDF?',
+    benefits: [
+      'Bundle multiple photos, scans, receipts, or screenshots into one document.',
+      'Create a multi-page PDF without uploading private files.',
+      'Use mixed JPG, PNG, and WEBP files in the same PDF.',
+      'Download one organized PDF instead of sending many image files.'
+    ],
+    howToHeading: 'How to Convert Multiple Images to PDF',
+    steps: [
+      'Upload all images you want to combine.',
+      'Review the selected files and remove unwanted images.',
+      'Click Convert to PDF to build a multi-page document.',
+      'Download your combined PDF.'
+    ],
+    faqs: [
+      ['Can I mix JPG and PNG images?', 'Yes. You can combine JPG, JPEG, PNG, and WEBP images in one PDF.'],
+      ['Does each image get its own page?', 'Yes. Each selected image is placed on a separate PDF page.'],
+      ['Is there a file upload?', 'No. Everything runs locally in your browser.']
+    ]
+  },
+  photo: {
+    title: 'Photo to PDF Converter Online Free | QuickTools',
+    description: 'Convert photos to PDF online for free. Turn phone pictures, scans, and document photos into a PDF privately in your browser.',
+    pageName: 'Photo to PDF Converter',
+    heading: 'Photo to PDF Converter',
+    intro: 'Turn photos from your phone, camera, or scanner into a PDF document. QuickTools converts locally in your browser with no uploads.',
+    uploadLabel: 'Upload photos',
+    uploadHelp: 'Select one or more photos to convert into a PDF. This works well for document photos, receipts, notes, and scanned pages.',
+    whyHeading: 'Why convert photos to PDF?',
+    benefits: [
+      'Turn document photos into a PDF for forms, email, or printing.',
+      'Combine several photo pages into one easy-to-share file.',
+      'Keep personal photos and documents private with local processing.',
+      'Create a PDF quickly from phone or camera images.'
+    ],
+    howToHeading: 'How to Convert a Photo to PDF',
+    steps: [
+      'Upload one or more photos from your device.',
+      'Check the preview list before conversion.',
+      'Click Convert to PDF to generate the document.',
+      'Download the PDF and use it wherever needed.'
+    ],
+    faqs: [
+      ['Can I convert phone photos?', 'Yes. JPG, PNG, and WEBP photos from phones and cameras are supported.'],
+      ['Can I make a PDF from several photos?', 'Yes. Add multiple photos and QuickTools will create a multi-page PDF.'],
+      ['Do I need to create an account?', 'No. The tool is free to use with no signup.']
+    ]
+  }
+};
+
+export default function ImageToPDF({ variant = 'default' }) {
+  const config = pageConfigs[variant] || pageConfigs.default;
 
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [outputUrl, setOutputUrl] = useState(null);
@@ -207,26 +351,27 @@ export default function ImageToPDF() {
   return (
     <>
       <SEO
-        title="Image to PDF Converter | QuickTools"
-        description="Convert JPG, PNG, and WEBP images into a printable PDF document instantly in your browser. No uploads or backend required."
+        title={config.title}
+        description={config.description}
+        pageName={config.pageName}
       />
 
       <div className="max-w-5xl mx-auto space-y-8 py-4">
-      <div className="space-y-3">
-        <div className="flex items-center gap-3 text-indigo-600">
-          <Files className="h-6 w-6" />
-          <h1 className="text-3xl font-extrabold text-slate-900">Image to PDF Converter</h1>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 text-indigo-600">
+            <Files className="h-6 w-6" />
+            <h1 className="text-3xl font-extrabold text-slate-900">{config.heading}</h1>
+          </div>
+          <p className="text-slate-600 text-sm leading-relaxed">
+            {config.intro}
+          </p>
         </div>
-        <p className="text-slate-600 text-sm leading-relaxed">
-          Convert JPG, PNG, or WEBP images into a printable PDF document in your browser. No uploads, no backend, and no data leaves your device.
-        </p>
-      </div>
 
       <div className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-6">
         <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
           <div className="space-y-2">
-            <p className="font-semibold text-slate-900">Upload images</p>
-            <p className="text-sm text-slate-500">Select one or more image files to combine into a PDF. Each image becomes one PDF page.</p>
+            <p className="font-semibold text-slate-900">{config.uploadLabel}</p>
+            <p className="text-sm text-slate-500">{config.uploadHelp}</p>
           </div>
           <button
             type="button"
@@ -338,14 +483,37 @@ export default function ImageToPDF() {
         </div>
       </div>
 
-      <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900">Why use Image to PDF?</h2>
-        <ul className="mt-6 space-y-3 text-sm text-slate-600">
-          <li className="list-disc list-inside">Create a PDF from one or multiple images instantly without uploading files.</li>
-          <li className="list-disc list-inside">Each photo becomes its own page for easy printing and sharing.</li>
-          <li className="list-disc list-inside">All conversion is performed locally in the browser for full privacy.</li>
-          <li className="list-disc list-inside">Supports JPG, JPEG, PNG, and WEBP images.</li>
-        </ul>
+      <section className="glass-panel rounded-3xl p-8 border border-slate-200/60 shadow-sm space-y-8">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">{config.whyHeading}</h2>
+          <ul className="mt-6 space-y-3 text-sm text-slate-600">
+            {config.benefits.map((benefit) => (
+              <li key={benefit} className="list-disc list-inside">{benefit}</li>
+            ))}
+          </ul>
+        </div>
+
+        <section aria-labelledby="image-pdf-how-to" className="space-y-4">
+          <h3 id="image-pdf-how-to" className="text-xl font-semibold text-slate-900">{config.howToHeading}</h3>
+          <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600">
+            {config.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </section>
+
+        <section aria-labelledby="image-pdf-faq" className="space-y-4">
+          <h3 id="image-pdf-faq" className="text-xl font-semibold text-slate-900">FAQ</h3>
+          <div className="space-y-4 text-sm text-slate-600">
+            {config.faqs.map(([question, answer]) => (
+              <div key={question}>
+                <p className="font-semibold text-slate-900">{question}</p>
+                <p>{answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
       </section>
     </div>
     </>

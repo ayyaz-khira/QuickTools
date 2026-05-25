@@ -1,11 +1,11 @@
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 
-const BASE_URL = 'https://quicktools.vercel.app';
+const BASE_URL = 'https://quick-tools-theta.vercel.app';
 const DEFAULT_IMAGE = `${BASE_URL}/favicon.png`;
 const SITE_NAME = 'QuickTools';
 
-export default function SEO({ title, description }) {
+export default function SEO({ title, description, pageName }) {
   const location = useLocation();
   const canonicalUrl = `${BASE_URL}${location.pathname}`;
   const structuredData = {
@@ -23,8 +23,8 @@ export default function SEO({ title, description }) {
       },
       {
         '@type': 'WebApplication',
-        'name': SITE_NAME,
-        'url': BASE_URL,
+        'name': pageName || SITE_NAME,
+        'url': canonicalUrl,
         'applicationCategory': 'BusinessApplication',
         'operatingSystem': 'Web Browser',
         'browserRequirements': 'Runs in modern browsers with no downloads.',
@@ -38,7 +38,6 @@ export default function SEO({ title, description }) {
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
-      <meta name="keywords" content="QuickTools, local-first, image utilities, privacy-focused, passport photo, image resize, signature cropper" />
       <meta name="robots" content="index, follow" />
       <link rel="canonical" href={canonicalUrl} />
 

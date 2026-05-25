@@ -38,6 +38,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/image-to-pdf" className="hover:text-indigo-600 transition-colors">
+                Image to PDF
+              </Link>
+            </li>
+            <li>
               <Link to="/signature-cropper" className="hover:text-indigo-600 transition-colors">
                 Signature Cropper
               </Link>
@@ -46,21 +51,45 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="text-slate-900 font-bold text-sm tracking-wider uppercase mb-4">Privacy & Tech</h3>
-          <div className="space-y-3 text-sm font-semibold">
-            <div className="flex items-center space-x-2 text-emerald-600">
-              <Lock className="h-4 w-4" />
-              <span>100% Client-Side</span>
-            </div>
-            <div className="flex items-center space-x-2 text-indigo-600">
-              <Shield className="h-4 w-4" />
-              <span>No Server Uploads</span>
-            </div>
-            <div className="flex items-center space-x-2 text-purple-600">
-              <Cpu className="h-4 w-4" />
-              <span>GPU Accelerated</span>
-            </div>
-          </div>
+          <h3 className="text-slate-900 font-bold text-sm tracking-wider uppercase mb-4">PDF Converters</h3>
+          <ul className="space-y-2 text-sm font-semibold">
+            <li>
+              <Link to="/jpg-to-pdf" className="hover:text-indigo-600 transition-colors">
+                JPG to PDF
+              </Link>
+            </li>
+            <li>
+              <Link to="/png-to-pdf" className="hover:text-indigo-600 transition-colors">
+                PNG to PDF
+              </Link>
+            </li>
+            <li>
+              <Link to="/images-to-pdf" className="hover:text-indigo-600 transition-colors">
+                Images to PDF
+              </Link>
+            </li>
+            <li>
+              <Link to="/photo-to-pdf" className="hover:text-indigo-600 transition-colors">
+                Photo to PDF
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div className="max-w-7xl mx-auto mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm font-semibold">
+        <div className="flex items-center space-x-2 text-emerald-600">
+          <Lock className="h-4 w-4" />
+          <span>100% Client-Side</span>
+        </div>
+        <div className="flex items-center space-x-2 text-indigo-600">
+          <Shield className="h-4 w-4" />
+          <span>No Server Uploads</span>
+        </div>
+        <div className="flex items-center space-x-2 text-purple-600">
+          <Cpu className="h-4 w-4" />
+          <span>Fast Browser Processing</span>
         </div>
       </div>
 
