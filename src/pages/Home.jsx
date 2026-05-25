@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Camera, Image as ImageIcon, CheckSquare, Zap as ZapIcon, ArrowRight, ShieldCheck, Zap, Heart, Files } from 'lucide-react';
+import { Camera, Image as ImageIcon, CheckSquare, Zap as ZapIcon, ArrowRight, ShieldCheck, Zap, Heart, Files, FileText } from 'lucide-react';
 import SEO from '../components/SEO';
 
 export default function Home() {
@@ -38,6 +38,15 @@ export default function Home() {
       color: 'from-sky-500 to-cyan-500',
       tag: 'New',
       features: ['Multi-image PDF export', 'A4-ready page fitting', 'Client-side conversion only', 'Download as PDF instantly']
+    },
+    {
+      name: 'Add Page Numbers to PDF',
+      description: 'Add page numbers to your PDF documents with flexible positioning and customizable formatting. Choose placement, font size, and starting number.',
+      href: '/add-page-numbers-to-pdf',
+      icon: FileText,
+      color: 'from-pink-500 to-rose-500',
+      tag: 'New',
+      features: ['6 position options', 'Customizable font size & margins', 'Choose starting page number', 'Client-side processing only']
     },
     {      name: 'Signature Cropper',
       description: 'Crop hand-written signatures from scanned papers. Cleans up backgrounds by converting them to solid white and boosting ink contrast.',
@@ -110,7 +119,7 @@ Resize images, create passport photos, and crop signatures instantly in your bro
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
                   {tool.name}
                 </h3>
                 
