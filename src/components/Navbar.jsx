@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Camera, Image as ImageIcon, CheckSquare, Zap, Files, FileText, Settings, Menu, X, ChevronDown } from 'lucide-react';
+import { Camera, Image as ImageIcon, CheckSquare, Zap, Files, FileText, Settings, Menu, X, ChevronDown, GitMerge } from 'lucide-react';
 
 export default function Navbar() {
   const location = useLocation();
@@ -14,14 +14,15 @@ export default function Navbar() {
     { name: 'Compress Image', href: '/compress-image', icon: Zap },
     { name: 'Image to PDF', href: '/image-to-pdf', icon: Files },
     { name: 'Add Page Numbers', href: '/add-page-numbers-to-pdf', icon: FileText },
+    { name: 'Merge PDF', href: '/merge-pdf', icon: GitMerge },
     { name: 'Signature Cropper', href: '/signature-cropper', icon: CheckSquare },
   ];
 
   // Featured tools shown directly in navbar
   const featuredTools = [
     { name: 'Image to PDF', href: '/image-to-pdf', icon: Files },
+    { name: 'Merge PDF', href: '/merge-pdf', icon: GitMerge },
     { name: 'Compress Image', href: '/compress-image', icon: Zap },
-    { name: 'Add Page Numbers', href: '/add-page-numbers-to-pdf', icon: FileText },
   ];
 
   // Close dropdown when clicking outside
@@ -63,7 +64,7 @@ export default function Navbar() {
                   <Link
                     key={item.name}
                     to={item.href}
-	                    className={`flex items-center px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-300 whitespace-nowrap ${
+                    className={`flex items-center px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-300 whitespace-nowrap ${
                       isActive
                         ? 'bg-indigo-50 text-indigo-600 border border-indigo-100/80'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
@@ -82,7 +83,7 @@ export default function Navbar() {
               <div className="relative" ref={toolsDropdownRef}>
                 <button
                   onClick={() => setIsToolsOpen(!isToolsOpen)}
-	                  className="flex items-center px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all duration-300 whitespace-nowrap"
+                  className="flex items-center px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all duration-300 whitespace-nowrap"
                 >
                   <Settings className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   All Tools

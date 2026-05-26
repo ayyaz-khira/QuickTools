@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Camera, Image as ImageIcon, CheckSquare, Zap as ZapIcon, ArrowRight, ShieldCheck, Zap, Heart, Files, FileText } from 'lucide-react';
+import { Camera, Image as ImageIcon, CheckSquare, Zap as ZapIcon, ArrowRight, ShieldCheck, Zap, Heart, Files, FileText, GitMerge } from 'lucide-react';
 import SEO from '../components/SEO';
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
       navigate(href);
     }
   };
-
+  
   const tools = [
     {
       name: 'Passport Size Photo Maker',
@@ -27,6 +27,23 @@ export default function Home() {
       color: 'from-blue-500 to-indigo-500',
       tag: 'Best Seller',
       features: ['Standard 2x2" & 3.5x4.5cm sizes', 'Alignment guidelines', 'Single or grid sheet output', '100% private']
+    },
+    {      name: 'Image to PDF',
+      description: 'Convert one or more images into a printable PDF document instantly in your browser with no uploads.',
+      href: '/image-to-pdf',
+      icon: Files,
+      color: 'from-sky-500 to-cyan-500',
+      tag: 'New',
+      features: ['Multi-image PDF export', 'A4-ready page fitting', 'Client-side conversion only', 'Download as PDF instantly']
+    },
+    {
+      name: 'Merge PDF',
+      description: 'Combine multiple PDF documents into one. Drag to reorder files, then merge instantly. All processing happens locally in your browser.',
+      href: '/merge-pdf',
+      icon: GitMerge,
+      color: 'from-purple-600 to-violet-500',
+      tag: 'New',
+      features: ['Merge multiple PDFs', 'Reorder files before merging', 'Client-side processing', 'Download merged document']
     },
     {
       name: 'Resize Image to KB',
@@ -45,14 +62,6 @@ export default function Home() {
       color: 'from-emerald-500 to-teal-500',
       tag: 'Lightning Fast',
       features: ['Quality slider control', 'Real-time file size preview', 'Instant browser processing', 'No server uploads']
-    },
-    {      name: 'Image to PDF',
-      description: 'Convert one or more images into a printable PDF document instantly in your browser with no uploads.',
-      href: '/image-to-pdf',
-      icon: Files,
-      color: 'from-sky-500 to-cyan-500',
-      tag: 'New',
-      features: ['Multi-image PDF export', 'A4-ready page fitting', 'Client-side conversion only', 'Download as PDF instantly']
     },
     {
       name: 'Add Page Numbers to PDF',

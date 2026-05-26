@@ -8,6 +8,7 @@ import ResizeImageSeo from './pages/ResizeImageSeo';
 import CompressImage from './pages/CompressImage';
 import ImageToPDF from './pages/ImageToPDF';
 import AddPageNumbersToPDF from './pages/AddPageNumbersToPDF';
+import MergePDF from './pages/MergePDF';
 import SignatureCropper from './pages/SignatureCropper';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
@@ -28,6 +29,7 @@ function App() {
           <Route path="/images-to-pdf" element={<ImageToPDF variant="images" />} />
           <Route path="/photo-to-pdf" element={<ImageToPDF variant="photo" />} />
           <Route path="/add-page-numbers-to-pdf" element={<AddPageNumbersToPDF />} />
+          <Route path="/merge-pdf" element={<MergePDF />} />
           <Route path="/resize-image-to-20kb" element={<ResizeImageSeo targetKb={20} />} />
           <Route path="/resize-image-to-50kb" element={<ResizeImageSeo targetKb={50} />} />
           <Route path="/resize-image-to-100kb" element={<ResizeImageSeo targetKb={100} />} />

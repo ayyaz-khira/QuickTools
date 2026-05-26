@@ -48,6 +48,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/merge-pdf" className="hover:text-indigo-600 transition-colors">
+                Merge PDF
+              </Link>
+            </li>
+            <li>
               <Link to="/signature-cropper" className="hover:text-indigo-600 transition-colors">
                 Signature Cropper
               </Link>

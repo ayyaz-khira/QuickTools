@@ -16,7 +16,12 @@
     <loc>https://quick-tools-theta.vercel.app/compress-image</loc>
     <priority>0.8</priority>
   </url>
-  <url>    <loc>https://quick-tools-theta.vercel.app/add-page-numbers-to-pdf</loc>
+  <url>
+    <loc>https://quick-tools-theta.vercel.app/add-page-numbers-to-pdf</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quick-tools-theta.vercel.app/merge-pdf</loc>
     <priority>0.8</priority>
   </url>
   <url>    <loc>https://quick-tools-theta.vercel.app/signature-cropper</loc>
