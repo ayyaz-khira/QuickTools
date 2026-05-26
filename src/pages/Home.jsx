@@ -20,13 +20,22 @@ export default function Home() {
   
   const tools = [
     {
-      name: 'Passport Size Photo Maker',
-      description: 'Crop and align your photos to official government passport sizes. Features head overlay guides, custom crop positions, and a multi-photo print sheet generator.',
-      href: '/passport-photo',
-      icon: Camera,
-      color: 'from-blue-500 to-indigo-500',
-      tag: 'Best Seller',
-      features: ['Standard 2x2" & 3.5x4.5cm sizes', 'Alignment guidelines', 'Single or grid sheet output', '100% private']
+      name: 'Compress Image',
+      description: 'Reduce image file size while maintaining visual quality. Compress JPG, PNG, and WEBP images instantly in your browser with no uploads.',
+      href: '/compress-image',
+      icon: ZapIcon,
+      color: 'from-emerald-500 to-teal-500',
+      tag: 'Lightning Fast',
+      features: ['Quality slider control', 'Real-time file size preview', 'Instant browser processing', 'No server uploads']
+    },
+    {
+      name: 'Background Remover',
+      description: 'Remove backgrounds from photos instantly using AI segmentation. Download transparent PNG images in your browser with no uploads.',
+      href: '/background-remover',
+      icon: ImageIcon,
+      color: 'from-cyan-500 to-sky-500',
+      tag: 'AI Powered',
+      features: ['AI background segmentation', 'Transparent PNG export', 'Preview in multiple modes', 'Client-side processing']
     },
     {      name: 'Image to PDF',
       description: 'Convert one or more images into a printable PDF document instantly in your browser with no uploads.',
@@ -46,6 +55,15 @@ export default function Home() {
       features: ['Merge multiple PDFs', 'Reorder files before merging', 'Client-side processing', 'Download merged document']
     },
     {
+      name: 'Passport Size Photo Maker',
+      description: 'Crop and align your photos to official government passport sizes. Features head overlay guides, custom crop positions, and a multi-photo print sheet generator.',
+      href: '/passport-photo',
+      icon: Camera,
+      color: 'from-blue-500 to-indigo-500',
+      tag: 'Best Seller',
+      features: ['Standard 2x2" & 3.5x4.5cm sizes', 'Alignment guidelines', 'Single or grid sheet output', '100% private']
+    },
+    {
       name: 'Resize Image to KB',
       description: 'Compress images precisely to a target file size (e.g., under 50 KB, 100 KB) for official web applications, portals, and online forms without losing quality.',
       href: '/resize-image',
@@ -53,15 +71,6 @@ export default function Home() {
       color: 'from-indigo-500 to-purple-500',
       tag: 'Popular',
       features: ['Iterative smart compression', 'Custom target KB settings', 'Before vs. After file details', 'No image uploads']
-    },
-    {
-      name: 'Compress Image',
-      description: 'Reduce image file size while maintaining visual quality. Compress JPG, PNG, and WEBP images instantly in your browser with no uploads.',
-      href: '/compress-image',
-      icon: ZapIcon,
-      color: 'from-emerald-500 to-teal-500',
-      tag: 'Lightning Fast',
-      features: ['Quality slider control', 'Real-time file size preview', 'Instant browser processing', 'No server uploads']
     },
     {
       name: 'Add Page Numbers to PDF',
@@ -101,7 +110,8 @@ export default function Home() {
         </h1>
         
         <p className="text-lg text-slate-600 leading-relaxed font-medium">
-Resize images, create passport photos, convert images to PDF, add page numbers, and crop signatures instantly in your browser — with zero uploads and complete privacy.         </p>
+          Resize images, compress photos, create passport photos, remove backgrounds with AI, convert to PDF, add page numbers, merge PDFs, and crop signatures instantly in your browser — with zero uploads and complete privacy.
+        </p>
 
         <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs font-bold text-slate-500">
           <div className="flex items-center space-x-1.5">
@@ -122,7 +132,7 @@ Resize images, create passport photos, convert images to PDF, add page numbers, 
       </div>
 
       {/* Grid Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-max lg:auto-rows-fr">
         {tools.map((tool) => {
           const Icon = tool.icon;
           return (
@@ -132,7 +142,7 @@ Resize images, create passport photos, convert images to PDF, add page numbers, 
 	              tabIndex={0}
 	              onClick={(event) => openTool(event, tool.href)}
 	              onKeyDown={(event) => handleToolKeyDown(event, tool.href)}
-	              className="glass-card rounded-3xl p-6 flex flex-col justify-between relative group overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+	              className="glass-card rounded-3xl p-6 flex flex-col justify-between relative group overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 h-full"
 	            >
               {/* Card top gradient line decoration */}
               <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent group-hover:via-indigo-500 transition-all duration-500"></div>

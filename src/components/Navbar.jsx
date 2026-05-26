@@ -12,6 +12,7 @@ export default function Navbar() {
     { name: 'Passport Size Photo Maker', href: '/passport-photo', icon: Camera },
     { name: 'Resize to KB', href: '/resize-image', icon: ImageIcon },
     { name: 'Compress Image', href: '/compress-image', icon: Zap },
+    { name: 'Background Remover', href: '/background-remover', icon: ImageIcon },
     { name: 'Image to PDF', href: '/image-to-pdf', icon: Files },
     { name: 'Add Page Numbers', href: '/add-page-numbers-to-pdf', icon: FileText },
     { name: 'Merge PDF', href: '/merge-pdf', icon: GitMerge },

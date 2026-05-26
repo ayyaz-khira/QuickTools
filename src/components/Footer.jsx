@@ -38,6 +38,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/background-remover" className="hover:text-indigo-600 transition-colors">
+                Background Remover
+              </Link>
+            </li>
+            <li>
               <Link to="/image-to-pdf" className="hover:text-indigo-600 transition-colors">
                 Image to PDF
               </Link>
