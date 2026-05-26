@@ -9,21 +9,25 @@ export default function Navbar() {
   const toolsDropdownRef = useRef(null);
 
   const navigation = [
+    // Image Tools
+    { category: 'Image Tools' },
     { name: 'Passport Size Photo Maker', href: '/passport-photo', icon: Camera },
     { name: 'Resize to KB', href: '/resize-image', icon: ImageIcon },
     { name: 'Compress Image', href: '/compress-image', icon: Zap },
     { name: 'Background Remover', href: '/background-remover', icon: ImageIcon },
+    { name: 'Signature Cropper', href: '/signature-cropper', icon: CheckSquare },
+    // PDF Tools
+    { category: 'PDF Tools' },
     { name: 'Image to PDF', href: '/image-to-pdf', icon: Files },
     { name: 'Add Page Numbers', href: '/add-page-numbers-to-pdf', icon: FileText },
     { name: 'Merge PDF', href: '/merge-pdf', icon: GitMerge },
-    { name: 'Signature Cropper', href: '/signature-cropper', icon: CheckSquare },
   ];
 
   // Featured tools shown directly in navbar
   const featuredTools = [
+    { name: 'Background Remover', href: '/background-remover', icon: ImageIcon },
     { name: 'Image to PDF', href: '/image-to-pdf', icon: Files },
-    { name: 'Merge PDF', href: '/merge-pdf', icon: GitMerge },
-    { name: 'Compress Image', href: '/compress-image', icon: Zap },
+    { name: 'Passport Size Photo Maker', href: '/passport-photo', icon: Camera },
   ];
 
   // Close dropdown when clicking outside
@@ -94,7 +98,17 @@ export default function Navbar() {
                 {/* Dropdown Menu */}
                 {isToolsOpen && (
                   <div className="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-slate-200/80 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                    {navigation.map((item) => {
+                    {navigation.map((item, idx) => {
+                      // Render category header
+                      if (item.category) {
+                        return (
+                          <div key={idx} className="px-4 py-2.5 mt-2 first:mt-0 text-xs font-extrabold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-100">
+                            {item.category}
+                          </div>
+                        );
+                      }
+                      
+                      // Render tool link
                       const Icon = item.icon;
                       const isActive = location.pathname === item.href;
                       return (
@@ -178,7 +192,17 @@ export default function Navbar() {
 
             {isToolsOpen && (
               <div id="mobile-tools-menu" className="space-y-1 pl-4">
-                {navigation.map((item) => {
+                {navigation.map((item, idx) => {
+                  // Render category header
+                  if (item.category) {
+                    return (
+                      <div key={idx} className="px-4 py-2 mt-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                        {item.category}
+                      </div>
+                    );
+                  }
+                  
+                  // Render tool link
                   const Icon = item.icon;
                   const isActive = location.pathname === item.href;
                   return (
