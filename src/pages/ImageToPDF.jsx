@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
-import { Files, Upload, Download, Trash2, FileText } from 'lucide-react';
+import { Files, Upload, Download, Trash2, FileText, RefreshCw } from 'lucide-react';
 import SEO from '../components/SEO';
 import { isSupportedImageFile } from '../utils/fileValidation';
 
@@ -430,7 +430,7 @@ export default function ImageToPDF({ variant = 'default' }) {
                 onClick={convertToPdf}
                 disabled={selectedFiles.length === 0 || isProcessing}
               >
-                <FileText className="h-4 w-4" />
+                {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
                 {isProcessing ? 'Creating PDF...' : 'Convert to PDF'}
               </button>
             </div>

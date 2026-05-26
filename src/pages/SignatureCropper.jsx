@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
 import { Upload, Download, Sliders, RefreshCw, X, Palette, Eye, AlertCircle, ShieldCheck } from 'lucide-react';
 import { getCleanedSignatureImg } from '../utils/cropImage';
@@ -23,6 +22,7 @@ export default function SignatureCropper() {
   
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [cleanedSignatureUrl, setCleanedSignatureUrl] = useState(null);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
@@ -79,23 +79,28 @@ export default function SignatureCropper() {
   const validateAndProcessFile = async (file) => {
     setError(null);
     if (!file) return;
+    setIsLoadingImage(true);
 
-    if (!isSupportedImageFile(file)) {
-      setError('Unsupported file format. Please upload a JPG, JPEG, PNG, or WEBP image.');
-      setImageSrc(null);
-      setCleanedSignatureUrl(null);
-      return;
+    try {
+      if (!isSupportedImageFile(file)) {
+        setError('Unsupported file format. Please upload a JPG, JPEG, PNG, or WEBP image.');
+        setImageSrc(null);
+        setCleanedSignatureUrl(null);
+        return;
+      }
+
+      if (file.size > 12 * 1024 * 1024) {
+        setError('The selected file is too large (above 12 MB). Please select an image under 12 MB to ensure fast client-side performance.');
+        setImageSrc(null);
+        setCleanedSignatureUrl(null);
+        return;
+      }
+
+      const dataUrl = await readFileAsDataUrl(file);
+      setImageSrc(dataUrl);
+    } finally {
+      setIsLoadingImage(false);
     }
-
-    if (file.size > 12 * 1024 * 1024) {
-      setError('The selected file is too large (above 12 MB). Please select an image under 12 MB to ensure fast client-side performance.');
-      setImageSrc(null);
-      setCleanedSignatureUrl(null);
-      return;
-    }
-
-    const dataUrl = await readFileAsDataUrl(file);
-    setImageSrc(dataUrl);
   };
 
   const handleFileChange = async (e) => {
@@ -205,17 +210,18 @@ export default function SignatureCropper() {
                   className="sr-only"
                   aria-label="Choose a signature image"
                 />
-                <span className="inline-flex px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs transition-colors duration-200 shadow-sm">
-                  Choose Image
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs transition-colors duration-200 shadow-sm">
+                  {isLoadingImage && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
+                  {isLoadingImage ? 'Loading Image...' : 'Choose Image'}
                 </span>
                 
                 <div className="p-4 bg-slate-100 group-hover:bg-indigo-600 rounded-2xl text-slate-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                  <Upload className="h-8 w-8" />
+                  {isLoadingImage ? <RefreshCw className="h-8 w-8 animate-spin" /> : <Upload className="h-8 w-8" />}
                 </div>
 
                 <div className="space-y-2">
                   <p className="text-base font-bold text-slate-800">
-                    Drag and drop your signature scan here, or <span className="text-indigo-600 hover:underline">browse</span>
+	                    {isLoadingImage ? 'Reading your signature image...' : <>Drag and drop your signature scan here, or <span className="text-indigo-600 hover:underline">browse</span></>}
                   </p>
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
                     Supports: JPG, JPEG, PNG, WEBP
@@ -493,7 +499,7 @@ export default function SignatureCropper() {
                   <div className="bg-slate-100 p-4 rounded-full text-slate-400 border border-slate-200/80 shadow-sm inline-block">
                     <Eye className="h-6 w-6" />
                   </div>
-                  <p className="text-slate-800 text-xs font-bold">Preview Standby</p>
+	                  <p className="text-slate-800 text-xs font-bold">{generating ? 'Cleaning signature...' : 'Preview Standby'}</p>
                   <p className="text-slate-500 text-[10px] max-w-xs font-semibold">
                     Once loaded, your cleaned signature rendering outputs display here.
                   </p>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { FileUp, Download, Settings, Trash2, AlertCircle, Check, FileText, Eye, X } from 'lucide-react';
+import { FileUp, Download, Settings, Trash2, AlertCircle, Check, FileText, Eye, X, RefreshCw } from 'lucide-react';
 import SEO from '../components/SEO';
 import { isSupportedPdfFile } from '../utils/fileValidation';
 
@@ -17,6 +17,7 @@ export default function AddPageNumbersToPDF() {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfData, setPdfData] = useState(null);
   const [fileName, setFileName] = useState('');
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
@@ -63,25 +64,26 @@ export default function AddPageNumbersToPDF() {
   const handleFileSelect = async (file) => {
     setError(null);
     setOutputUrl(null);
-
-    if (!isSupportedPdfFile(file)) {
-      setError('Only PDF files are supported.');
-      setPdfFile(null);
-      setPdfData(null);
-      return;
-    }
-
-    if (file.size > 50 * 1024 * 1024) {
-      setError('File size exceeds 50 MB limit.');
-      setPdfFile(null);
-      setPdfData(null);
-      return;
-    }
-
-    setFileName(file.name);
-    setPdfFile(file);
+    setIsLoadingFile(true);
 
     try {
+      if (!isSupportedPdfFile(file)) {
+        setError('Only PDF files are supported.');
+        setPdfFile(null);
+        setPdfData(null);
+        return;
+      }
+
+      if (file.size > 50 * 1024 * 1024) {
+        setError('File size exceeds 50 MB limit.');
+        setPdfFile(null);
+        setPdfData(null);
+        return;
+      }
+
+      setFileName(file.name);
+      setPdfFile(file);
+
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       const pageCount = pdfDoc.getPageCount();
@@ -91,6 +93,8 @@ export default function AddPageNumbersToPDF() {
       setError('Could not read PDF file. It may be corrupted or password-protected.');
       setPdfFile(null);
       setPdfData(null);
+    } finally {
+      setIsLoadingFile(false);
     }
   };
 
@@ -230,11 +234,17 @@ export default function AddPageNumbersToPDF() {
             onDragOver={handleDrag}
             onDragEnter={handleDrag}
             onDragLeave={() => setDragActive(false)}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => !isLoadingFile && fileInputRef.current?.click()}
           >
-            <FileUp className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-            <p className="text-sm text-slate-600 font-semibold">Drag and drop your PDF here</p>
-            <p className="text-xs text-slate-500 mt-1">or click to select a file</p>
+            {isLoadingFile ? (
+              <RefreshCw className="h-12 w-12 text-indigo-500 mx-auto mb-3 animate-spin" />
+            ) : (
+              <FileUp className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+            )}
+            <p className="text-sm text-slate-600 font-semibold">
+              {isLoadingFile ? 'Reading PDF...' : 'Drag and drop your PDF here'}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">{isLoadingFile ? 'Checking page count and file details' : 'or click to select a file'}</p>
             <p className="text-xs text-slate-400 mt-2">Max 50 MB</p>
           </div>
 
@@ -347,9 +357,10 @@ export default function AddPageNumbersToPDF() {
 
             <button
               onClick={addPageNumbers}
-              disabled={isProcessing}
-              className="w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
+              disabled={isProcessing || isLoadingFile}
+              className="w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
+              {isProcessing && <RefreshCw className="h-4 w-4 animate-spin" />}
               {isProcessing ? 'Adding Page Numbers...' : 'Add Page Numbers'}
             </button>
           </div>

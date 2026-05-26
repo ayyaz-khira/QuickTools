@@ -34,7 +34,9 @@ export default function PassportPhoto() {
 
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [generatingPreview, setGeneratingPreview] = useState(false);
+  const [exportingSheetPdf, setExportingSheetPdf] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const fileInputRef = useRef(null);
@@ -249,27 +251,32 @@ export default function PassportPhoto() {
   const validateAndProcessFile = async (file) => {
     setError(null);
     if (!file) return;
+    setIsLoadingImage(true);
 
-    if (!isSupportedImageFile(file)) {
-      setError('Unsupported file format. Please upload a JPG, JPEG, PNG, or WEBP image.');
-      setImageSrc(null);
-      setCompressedResult(null);
-      setSheetPreviewUrl(null);
-      setSheetPngUrl(null);
-      return;
+    try {
+      if (!isSupportedImageFile(file)) {
+        setError('Unsupported file format. Please upload a JPG, JPEG, PNG, or WEBP image.');
+        setImageSrc(null);
+        setCompressedResult(null);
+        setSheetPreviewUrl(null);
+        setSheetPngUrl(null);
+        return;
+      }
+
+      if (file.size > 12 * 1024 * 1024) {
+        setError('The selected file is too large (above 12 MB). Please select an image under 12 MB to ensure fast client-side performance.');
+        setImageSrc(null);
+        setCompressedResult(null);
+        setSheetPreviewUrl(null);
+        setSheetPngUrl(null);
+        return;
+      }
+
+      const dataUrl = await readFileAsDataUrl(file);
+      setImageSrc(dataUrl);
+    } finally {
+      setIsLoadingImage(false);
     }
-
-    if (file.size > 12 * 1024 * 1024) {
-      setError('The selected file is too large (above 12 MB). Please select an image under 12 MB to ensure fast client-side performance.');
-      setImageSrc(null);
-      setCompressedResult(null);
-      setSheetPreviewUrl(null);
-      setSheetPngUrl(null);
-      return;
-    }
-
-    const dataUrl = await readFileAsDataUrl(file);
-    setImageSrc(dataUrl);
   };
 
   const handleFileChange = async (e) => {
@@ -338,10 +345,15 @@ export default function PassportPhoto() {
 
   const downloadSheetPdf = () => {
     if (!sheetCanvasRef.current) return;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgData = sheetCanvasRef.current.toDataURL('image/jpeg', 0.95);
-    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-    pdf.save(`passport_sheet_${sheetPhotosCount}_photos.pdf`);
+    setExportingSheetPdf(true);
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = sheetCanvasRef.current.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+      pdf.save(`passport_sheet_${sheetPhotosCount}_photos.pdf`);
+    } finally {
+      setTimeout(() => setExportingSheetPdf(false), 300);
+    }
   };
 
   return (
@@ -394,17 +406,18 @@ export default function PassportPhoto() {
                   className="sr-only"
                   aria-label="Choose a passport photo"
                 />
-                <span className="inline-flex px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs transition-colors duration-200 shadow-sm">
-                  Choose Image
-                </span>
-                
-                <div className="p-4 bg-slate-100 group-hover:bg-indigo-600 rounded-2xl text-slate-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                  <Upload className="h-8 w-8" />
-                </div>
+	                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs transition-colors duration-200 shadow-sm">
+	                  {isLoadingImage && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
+	                  {isLoadingImage ? 'Loading Image...' : 'Choose Image'}
+	                </span>
+	                
+	                <div className="p-4 bg-slate-100 group-hover:bg-indigo-600 rounded-2xl text-slate-500 group-hover:text-white transition-all duration-300 shadow-sm">
+	                  {isLoadingImage ? <RefreshCw className="h-8 w-8 animate-spin" /> : <Upload className="h-8 w-8" />}
+	                </div>
 
                 <div className="space-y-2">
                   <p className="text-base font-bold text-slate-800">
-                    Drag and drop your image here, or <span className="text-indigo-600 hover:underline">browse</span>
+	                    {isLoadingImage ? 'Reading your passport photo...' : <>Drag and drop your image here, or <span className="text-indigo-600 hover:underline">browse</span></>}
                   </p>
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
                     Supports: JPG, JPEG, PNG, WEBP
@@ -659,13 +672,13 @@ export default function PassportPhoto() {
           </div>
 
           <div className="glass-panel p-5 rounded-3xl border border-slate-200/60 shadow-sm space-y-5">
-            <div className="flex justify-between items-center gap-3">
-              <h2 className="text-base font-bold text-slate-900">Preview & Download</h2>
-              {compressedResult && (
-                <div className="text-[10px] font-bold text-slate-500">
-                  Target: {targetCompressKb} KB
-                </div>
-              )}
+	            <div className="flex justify-between items-center gap-3">
+	              <h2 className="text-base font-bold text-slate-900">Preview & Download</h2>
+	              {(compressedResult || generatingPreview) && (
+	                <div className="text-[10px] font-bold text-slate-500">
+	                  {generatingPreview ? 'Creating preview...' : `Target: ${targetCompressKb} KB`}
+	                </div>
+	              )}
             </div>
 
             <div className="flex items-center justify-center rounded-3xl bg-slate-50 border border-slate-200/70 min-h-[180px] p-5">
@@ -695,7 +708,7 @@ export default function PassportPhoto() {
                   <div className="bg-white p-3 rounded-full text-slate-400 border border-slate-200/80 shadow-sm inline-block">
                     <ImageIcon className="h-5 w-5" />
                   </div>
-                  <p className="text-slate-700 text-xs font-bold">Preview appears after upload</p>
+	                  <p className="text-slate-700 text-xs font-bold">{generatingPreview ? 'Creating preview...' : 'Preview appears after upload'}</p>
                 </div>
               )}
             </div>
@@ -786,12 +799,12 @@ export default function PassportPhoto() {
 
                   <button
                     onClick={downloadSheetPdf}
-                    disabled={!sheetPreviewUrl}
-                    className="py-2.5 px-4 rounded-xl border border-slate-200 hover:border-emerald-200 bg-white hover:bg-emerald-50/20 text-slate-700 hover:text-emerald-600 font-bold text-xs transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer disabled:opacity-50"
-                  >
-                    <FileText className="h-4 w-4 text-emerald-500" />
-                    <span>PDF</span>
-                  </button>
+	                    disabled={!sheetPreviewUrl || exportingSheetPdf}
+	                    className="py-2.5 px-4 rounded-xl border border-slate-200 hover:border-emerald-200 bg-white hover:bg-emerald-50/20 text-slate-700 hover:text-emerald-600 font-bold text-xs transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer disabled:opacity-50"
+	                  >
+	                    {exportingSheetPdf ? <RefreshCw className="h-4 w-4 text-emerald-500 animate-spin" /> : <FileText className="h-4 w-4 text-emerald-500" />}
+	                    <span>{exportingSheetPdf ? 'Exporting...' : 'PDF'}</span>
+	                  </button>
                 </div>
               </div>
             ) : (

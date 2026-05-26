@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import { FileUp, Download, AlertCircle, Check, FileText, Trash2, Eye, X, GripVertical } from 'lucide-react';
+import { FileUp, Download, AlertCircle, Check, FileText, Trash2, Eye, X, GripVertical, RefreshCw } from 'lucide-react';
 import SEO from '../components/SEO';
 import { isSupportedPdfFile } from '../utils/fileValidation';
 
 export default function MergePDF() {
   const [pdfFiles, setPdfFiles] = useState([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
@@ -16,11 +17,16 @@ export default function MergePDF() {
 
   const fileInputRef = useRef(null);
   const prevOutputUrlRef = useRef(null);
+  const pdfFilesRef = useRef([]);
+
+  useEffect(() => {
+    pdfFilesRef.current = pdfFiles;
+  }, [pdfFiles]);
 
   useEffect(() => {
     return () => {
       if (prevOutputUrlRef.current) URL.revokeObjectURL(prevOutputUrlRef.current);
-      pdfFiles.forEach(f => {
+      pdfFilesRef.current.forEach(f => {
         if (f.preview) URL.revokeObjectURL(f.preview);
       });
     };
@@ -50,39 +56,45 @@ export default function MergePDF() {
 
   const handleFiles = async (files) => {
     setError(null);
+    setIsLoadingFiles(true);
     const fileArray = Array.from(files);
     const validFiles = [];
 
-    for (const file of fileArray) {
-      if (!isSupportedPdfFile(file)) {
-        setError('Only PDF files are supported.');
-        continue;
+    try {
+      for (const file of fileArray) {
+        if (!isSupportedPdfFile(file)) {
+          setError('Only PDF files are supported.');
+          continue;
+        }
+
+        if (file.size > 50 * 1024 * 1024) {
+          setError('Some files exceed 50 MB limit and were skipped.');
+          continue;
+        }
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+          const pageCount = pdfDoc.getPageCount();
+
+          validFiles.push({
+            id: Date.now() + Math.random(),
+            name: file.name,
+            file,
+            arrayBuffer,
+            pageCount,
+            preview: URL.createObjectURL(file),
+          });
+        } catch (err) {
+          console.error(err);
+          setError(`Could not read ${file.name}. It may be corrupted or password-protected.`);
+        }
       }
 
-      if (file.size > 50 * 1024 * 1024) {
-        setError('Some files exceed 50 MB limit and were skipped.');
-        continue;
-      }
-
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-        const pageCount = pdfDoc.getPageCount();
-
-        validFiles.push({
-          id: Date.now() + Math.random(),
-          name: file.name,
-          file,
-          arrayBuffer,
-          pageCount,
-          preview: URL.createObjectURL(file),
-        });
-      } catch (err) {
-        setError(`Could not read ${file.name}. It may be corrupted or password-protected.`);
-      }
+      setPdfFiles((prev) => [...prev, ...validFiles]);
+    } finally {
+      setIsLoadingFiles(false);
     }
-
-    setPdfFiles((prev) => [...prev, ...validFiles]);
   };
 
   const removeFile = (id) => {
@@ -201,11 +213,17 @@ export default function MergePDF() {
             onDragOver={handleDrag}
             onDragEnter={handleDrag}
             onDragLeave={() => setDragActive(false)}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => !isLoadingFiles && fileInputRef.current?.click()}
           >
-            <FileUp className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-            <p className="text-sm text-slate-600 font-semibold">Drag and drop your PDFs here</p>
-            <p className="text-xs text-slate-500 mt-1">or click to select files</p>
+            {isLoadingFiles ? (
+              <RefreshCw className="h-12 w-12 text-purple-500 mx-auto mb-3 animate-spin" />
+            ) : (
+              <FileUp className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+            )}
+            <p className="text-sm text-slate-600 font-semibold">
+              {isLoadingFiles ? 'Reading PDF files...' : 'Drag and drop your PDFs here'}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">{isLoadingFiles ? 'Checking pages and file details' : 'or click to select files'}</p>
             <p className="text-xs text-slate-400 mt-2">Max 50 MB per file</p>
           </div>
 
@@ -270,9 +288,10 @@ export default function MergePDF() {
         {pdfFiles.length >= 2 && (
           <button
             onClick={mergePdfs}
-            disabled={isProcessing}
-            className="w-full rounded-2xl bg-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
+            disabled={isProcessing || isLoadingFiles}
+            className="w-full rounded-2xl bg-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
+            {isProcessing && <RefreshCw className="h-4 w-4 animate-spin" />}
             {isProcessing ? 'Merging PDFs...' : `Merge ${pdfFiles.length} PDF${pdfFiles.length !== 1 ? 's' : ''}`}
           </button>
         )}
