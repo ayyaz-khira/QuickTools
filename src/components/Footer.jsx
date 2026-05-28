@@ -109,7 +109,18 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto border-t border-slate-200/80 mt-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-        <p>© {currentYear} QuickTools. All rights reserved.</p>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <p>© {currentYear} QuickTools. All rights reserved.</p>
+          <nav className="flex items-center gap-3">
+            <Link to="/privacy" className="hover:text-indigo-600">Privacy Policy</Link>
+            <span className="text-slate-300">•</span>
+            <Link to="/terms" className="hover:text-indigo-600">Terms</Link>
+            <span className="text-slate-300">•</span>
+            <Link to="/about" className="hover:text-indigo-600">About</Link>
+            <span className="text-slate-300">•</span>
+            <Link to="/contact" className="hover:text-indigo-600">Contact</Link>
+          </nav>
+        </div>
         <p className="mt-4 sm:mt-0">Designed for speed, efficiency, and absolute privacy.</p>
       </div>
     </footer>

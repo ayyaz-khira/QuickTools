@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import ResizeTool from '../components/ResizeTool';
+import RelatedTools from '../components/RelatedTools';
 
 export default function CompressImage() {
   return (
@@ -59,6 +60,13 @@ export default function CompressImage() {
             </div>
           </section>
         </section>
+        <RelatedTools
+          title="Related Tools"
+          tools={[
+            { name: 'Resize Image to KB', href: '/resize-image', description: 'Target a specific file size for uploads and forms.' },
+            { name: 'Image to PDF', href: '/image-to-pdf', description: 'Convert images into printable PDFs.' },
+          ]}
+        />
       </div>
     </>
   );

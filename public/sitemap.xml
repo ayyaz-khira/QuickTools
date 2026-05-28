@@ -59,4 +59,8 @@
     <loc>https://quick-tools-theta.vercel.app/resize-image-to-100kb</loc>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://quick-tools-theta.vercel.app/background-remover</loc>
+    <priority>0.8</priority>
+  </url>
 </urlset>

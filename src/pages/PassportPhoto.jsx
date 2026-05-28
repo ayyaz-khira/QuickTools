@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { Upload, X, Sliders, RefreshCw, Download, Image as ImageIcon, CheckCircle, AlertCircle, Palette, Maximize, Zap, Printer, FileText, FileImage, ChevronDown } from 'lucide-react';
-import { jsPDF } from 'jspdf';
 import { getCroppedImg, generatePrintSheetCanvas } from '../utils/cropImage';
 import SEO from '../components/SEO';
 import { isSupportedImageFile } from '../utils/fileValidation';
+import RelatedTools from '../components/RelatedTools';
 
 export default function PassportPhoto() {
   const testImageSrc = new URLSearchParams(window.location.search).get('test') === 'true'
@@ -42,6 +42,14 @@ export default function PassportPhoto() {
   const fileInputRef = useRef(null);
   const fileInputId = 'passport-photo-file-input';
   const sheetCanvasRef = useRef(null);
+  const jsPdfRef = useRef(null);
+
+  const loadJsPdf = async () => {
+    if (jsPdfRef.current) return jsPdfRef.current;
+    const mod = await import('jspdf');
+    jsPdfRef.current = mod;
+    return mod;
+  };
 
   const presets = [
     { id: '35x45_mm', name: '35x45 mm (Indian/Schengen Passport)', label: '35 x 45 mm', helper: 'Indian Passport / Visa', widthMm: 35, heightMm: 45 },
@@ -198,6 +206,7 @@ export default function PassportPhoto() {
     return () => clearTimeout(timeoutId);
   }, [compressedResult, sheetPhotosCount, currentWidthMm, currentHeightMm]);
 
+
   // Track previous compressed result URL to revoke it and prevent memory leaks
   const prevCompressedUrlRef = useRef(null);
   const prevSheetPngUrlRef = useRef(null);
@@ -343,10 +352,12 @@ export default function PassportPhoto() {
 
   // Export helpers are handled natively via <a> elements now
 
-  const downloadSheetPdf = () => {
+  const downloadSheetPdf = async () => {
     if (!sheetCanvasRef.current) return;
     setExportingSheetPdf(true);
     try {
+      const jspdfModule = await loadJsPdf();
+      const { jsPDF } = jspdfModule;
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgData = sheetCanvasRef.current.toDataURL('image/jpeg', 0.95);
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
@@ -863,6 +874,13 @@ export default function PassportPhoto() {
           </div>
         </section>
       </section>
+      <RelatedTools
+        title="Related Tools"
+        tools={[
+          { name: 'Signature Cropper', href: '/signature-cropper', description: 'Crop and clean handwritten signatures for documents.' },
+          { name: 'Background Remover', href: '/background-remover', description: 'Remove or replace photo backgrounds quickly.' },
+        ]}
+      />
       </div>
     </>
   );

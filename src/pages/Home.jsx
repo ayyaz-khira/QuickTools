@@ -37,7 +37,8 @@ export default function Home() {
       tag: 'AI Powered',
       features: ['AI background segmentation', 'Transparent PNG export', 'Preview in multiple modes', 'Client-side processing']
     },
-    {      name: 'Image to PDF',
+    {     
+      name: 'Image to PDF',
       description: 'Convert one or more images into a printable PDF document instantly in your browser with no uploads.',
       href: '/image-to-pdf',
       icon: Files,
@@ -81,7 +82,8 @@ export default function Home() {
       tag: 'New',
       features: ['6 position options', 'Customizable font size & margins', 'Choose starting page number', 'Client-side processing only']
     },
-    {      name: 'Signature Cropper',
+    {      
+      name: 'Signature Cropper',
       description: 'Crop hand-written signatures from scanned papers. Cleans up backgrounds by converting them to solid white and boosting ink contrast.',
       href: '/signature-cropper',
       icon: CheckSquare,

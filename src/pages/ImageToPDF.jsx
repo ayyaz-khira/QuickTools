@@ -1,8 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { jsPDF } from 'jspdf';
+const jsPdfRef = { current: null };
+
+const loadJsPdf = async () => {
+  if (jsPdfRef.current) return jsPdfRef.current;
+  const mod = await import('jspdf');
+  jsPdfRef.current = mod;
+  return mod;
+};
 import { Files, Upload, Download, Trash2, FileText, RefreshCw } from 'lucide-react';
 import SEO from '../components/SEO';
 import { isSupportedImageFile } from '../utils/fileValidation';
+import RelatedTools from '../components/RelatedTools';
 
 const pageConfigs = {
   default: {
@@ -301,6 +309,8 @@ export default function ImageToPDF({ variant = 'default' }) {
     setOutputUrl(null);
 
     try {
+      const jspdfModule = await loadJsPdf();
+      const { jsPDF } = jspdfModule;
       const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -515,6 +525,13 @@ export default function ImageToPDF({ variant = 'default' }) {
         </section>
 
       </section>
+        <RelatedTools
+          title="Related Tools"
+          tools={[
+            { name: 'Compress Image', href: '/compress-image', description: 'Optimize image sizes before conversion.' },
+            { name: 'Background Remover', href: '/background-remover', description: 'Remove backgrounds for cleaner PDFs.' },
+          ]}
+        />
     </div>
     </>
   );

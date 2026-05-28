@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { FileUp, Download, Settings, Trash2, AlertCircle, Check, FileText, Eye, X, RefreshCw } from 'lucide-react';
 import SEO from '../components/SEO';
 import { isSupportedPdfFile } from '../utils/fileValidation';
@@ -33,6 +32,15 @@ export default function AddPageNumbersToPDF() {
 
   const fileInputRef = useRef(null);
   const prevOutputUrlRef = useRef(null);
+  const pdfLibRef = useRef(null);
+
+  const loadPdfLib = async () => {
+    if (pdfLibRef.current) return pdfLibRef.current;
+    // Dynamically import pdf-lib only when needed to avoid bundling it into the main bundle
+    const mod = await import('pdf-lib');
+    pdfLibRef.current = mod;
+    return mod;
+  };
 
   useEffect(() => {
     return () => {
@@ -85,7 +93,8 @@ export default function AddPageNumbersToPDF() {
       setPdfFile(file);
 
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+      const pdfLib = await loadPdfLib();
+      const pdfDoc = await pdfLib.PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       const pageCount = pdfDoc.getPageCount();
       setPdfData({ arrayBuffer, pageCount });
     } catch (err) {
@@ -124,9 +133,10 @@ export default function AddPageNumbersToPDF() {
     setOutputUrl(null);
 
     try {
-      const pdfDoc = await PDFDocument.load(pdfData.arrayBuffer, { ignoreEncryption: true });
+      const pdfLib = await loadPdfLib();
+      const pdfDoc = await pdfLib.PDFDocument.load(pdfData.arrayBuffer, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
-      const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const helvetica = await pdfDoc.embedFont(pdfLib.StandardFonts.Helvetica);
 
       pages.forEach((page, index) => {
         const pageNum = startPage + index;
@@ -148,7 +158,7 @@ export default function AddPageNumbersToPDF() {
           y,
           size: fontSize,
           font: helvetica,
-          color: rgb(0, 0, 0),
+          color: pdfLib.rgb(0, 0, 0),
         });
       });
 

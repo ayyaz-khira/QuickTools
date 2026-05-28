@@ -1,5 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { PDFDocument } from 'pdf-lib';
+
+const pdfLibCache = { current: null };
+const loadPdfLib = async () => {
+  if (pdfLibCache.current) return pdfLibCache.current;
+  const mod = await import('pdf-lib');
+  pdfLibCache.current = mod;
+  return mod;
+};
 import { FileUp, Download, AlertCircle, Check, FileText, Trash2, Eye, X, GripVertical, RefreshCw } from 'lucide-react';
 import SEO from '../components/SEO';
 import { isSupportedPdfFile } from '../utils/fileValidation';
@@ -61,6 +68,7 @@ export default function MergePDF() {
     const validFiles = [];
 
     try {
+      const pdfLib = await loadPdfLib();
       for (const file of fileArray) {
         if (!isSupportedPdfFile(file)) {
           setError('Only PDF files are supported.');
@@ -74,7 +82,7 @@ export default function MergePDF() {
 
         try {
           const arrayBuffer = await file.arrayBuffer();
-          const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+          const pdfDoc = await pdfLib.PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
           const pageCount = pdfDoc.getPageCount();
 
           validFiles.push({
@@ -124,15 +132,15 @@ export default function MergePDF() {
     setOutputUrl(null);
 
     try {
-      const mergedPdf = await PDFDocument.create();
-
+      const pdfLib = await loadPdfLib();
+      const merged = await pdfLib.PDFDocument.create();
       for (const pdfFile of pdfFiles) {
-        const sourceDoc = await PDFDocument.load(pdfFile.arrayBuffer, { ignoreEncryption: true });
-        const copiedPages = await mergedPdf.copyPages(sourceDoc, sourceDoc.getPageIndices());
-        copiedPages.forEach(page => mergedPdf.addPage(page));
+        const sourceDoc = await pdfLib.PDFDocument.load(pdfFile.arrayBuffer, { ignoreEncryption: true });
+        const copiedPages = await merged.copyPages(sourceDoc, sourceDoc.getPageIndices());
+        copiedPages.forEach(page => merged.addPage(page));
       }
 
-      const pdfBytes = await mergedPdf.save();
+      const pdfBytes = await merged.save();
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
 

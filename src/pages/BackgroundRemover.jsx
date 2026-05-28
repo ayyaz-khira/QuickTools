@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, Download, Image as ImageIcon, RefreshCw, AlertCircle, Trash2 } from 'lucide-react';
 import SEO from '../components/SEO';
+import RelatedTools from '../components/RelatedTools';
 
 const SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
 
@@ -82,7 +83,14 @@ export default function BackgroundRemover() {
     setStatus('Loading background removal engine...');
 
     try {
-      const module = await import('@imgly/background-removal');
+      // Try loading the background-removal package from a CDN at runtime to avoid
+      // bundling large ONNX runtime/WASM assets into the main build. If the CDN
+      // import fails (offline or blocked), fall back to the local package import.
+      /* Load the library from a CDN at runtime to avoid bundling large
+         onnxruntime/wasm assets into the app. This requires the client to
+         be online; if the CDN import fails we surface an error to the user. */
+      /* eslint-disable-next-line no-undef, no-unused-vars */
+      const module = await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs');
       const remover = module.removeBackground || module.default || module;
       if (typeof remover !== 'function') {
         throw new Error('Background removal export is not a function.');
@@ -412,6 +420,13 @@ export default function BackgroundRemover() {
             </div>
           </section>
         </section>
+        <RelatedTools
+          title="Related Tools"
+          tools={[
+            { name: 'Compress Image', href: '/compress-image', description: 'Reduce file size while preserving quality.' },
+            { name: 'Image to PDF', href: '/image-to-pdf', description: 'Export images into printable PDFs.' },
+          ]}
+        />
       </div>
     </>
   );
